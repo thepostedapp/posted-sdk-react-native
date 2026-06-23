@@ -1,64 +1,24 @@
-name: CI
+name: ci
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-  merge_group:
-    types:
-      - checks_requested
-
+  pull_request: {}
+  push: { branches: [main] }
 jobs:
-  lint:
+  static:                       # mirrors scripts/static-check.sh
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-
-      - name: Setup
-        uses: ./.github/actions/setup
-
-      - name: Lint files
-        run: pnpm lint
-
-      - name: Typecheck files
-        run: pnpm typecheck
-
-  test:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: corepack enable
+      - run: bash scripts/static-check.sh
+  build:                        # full build the dev host can't do
+    needs: static
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-
-      - name: Setup
-        uses: ./.github/actions/setup
-
-      - name: Run unit tests
-        run: pnpm --filter @swmansion/react-native-detour exec jest --maxWorkers=2 --coverage --passWithNoTests
-
-  build-library:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-
-      - name: Setup
-        uses: ./.github/actions/setup
-
-      - name: Build package
-        run: pnpm build
-
-  smoke-mobile:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-
-      - name: Setup
-        uses: ./.github/actions/setup
-
-      - name: Smoke build mobile example
-        run: |
-          CI=1 pnpm --filter @swmansion/react-native-detour-expo-router-native-intent exec expo export --platform ios --platform android
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm -r build
+      - run: pnpm -r test

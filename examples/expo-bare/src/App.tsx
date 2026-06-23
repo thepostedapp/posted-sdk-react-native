@@ -1,6 +1,5 @@
-import { SafeAreaProvider } from "react-native-safe-area-context";
-
 import { type Config, PostedProvider } from "@posted-sdk/react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { Screen } from "./Screen";
 

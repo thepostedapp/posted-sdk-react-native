@@ -5,7 +5,7 @@ import { Linking } from "react-native";
 import { getDeferredLink } from "../api/getDeferredLink";
 import { resolveShortLink } from "../api/resolveShortLink";
 import { sendUniversalLinkClick } from "../api/sendUniversalLinkClick";
-import type { PostedContextType, PostedLink, LinkType, RequiredConfig } from "../types";
+import type { LinkType, PostedContextType, PostedLink, RequiredConfig } from "../types";
 import { checkIsFirstEntrance, markFirstEntrance } from "../utils/appEntrance";
 import {
   markReactNavigationInitialUrlProcessed,

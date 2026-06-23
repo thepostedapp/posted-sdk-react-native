@@ -1,11 +1,11 @@
 import { createPostedNativeIntentHandler } from "@posted-sdk/react-native/expo-router";
 
-import { detourConfig } from "./_layout";
+import { postedConfig } from "./_layout";
 
 // TODO(B4): update host pattern to new short-link domain once confirmed.
 const postedNativeIntentHandler = createPostedNativeIntentHandler({
   hosts: [/\.godetour\.link$/i],
-  config: detourConfig,
+  config: postedConfig,
   mapToRoute: ({ resolvedUrl }) => {
     // Example of a custom mapping function that transforms the resolved URL into an app route.
     // In this case, we cut the deeplink app hash and keep only the path and search params for routing.

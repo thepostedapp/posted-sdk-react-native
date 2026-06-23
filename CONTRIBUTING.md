@@ -8,7 +8,7 @@ We want this community to be friendly and respectful to each other. Please follo
 
 This project is a monorepo managed using [pnpm workspaces](https://pnpm.io/workspaces). It contains the following packages:
 
-- The library package in `packages/react-native-detour/`.
+- The library package in `packages/react-native-posted-sdk/`.
 - Example apps in the `examples/` directory.
 
 To get started with the project, make sure you have the correct version of [Node.js](https://nodejs.org/) installed. See the [`.nvmrc`](./.nvmrc) file for the version used in this project.
@@ -46,7 +46,7 @@ pnpm examples:expo-bare ios
 To confirm that the app is running with the new architecture, you can check the Metro logs for a message like this:
 
 ```sh
-Running "DetourReactNativeExample" with {"fabric":true,"initialProps":{"concurrentRoot":true},"rootTag":1}
+Running "PostedReactNativeExample" with {"fabric":true,"initialProps":{"concurrentRoot":true},"rootTag":1}
 ```
 
 Note the `"fabric":true` and `"concurrentRoot":true` properties.

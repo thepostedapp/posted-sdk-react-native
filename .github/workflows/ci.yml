@@ -3,7 +3,7 @@ on:
   pull_request: {}
   push: { branches: [main] }
 jobs:
-  static:                       # mirrors scripts/static-check.sh
+  static: # mirrors scripts/static-check.sh
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -11,7 +11,7 @@ jobs:
         with: { node-version: 22 }
       - run: corepack enable
       - run: bash scripts/static-check.sh
-  build:                        # full build the dev host can't do
+  build: # full build the dev host can't do
     needs: static
     runs-on: ubuntu-latest
     steps:

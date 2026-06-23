@@ -1,4 +1,4 @@
-import type { PostedLink, PostedUrlEvent, PostedUrlSubscription, LinkType } from "../types/index";
+import type { LinkType, PostedLink, PostedUrlEvent, PostedUrlSubscription } from "../types/index";
 
 export const POSTED_LINKING_PREFIX = "posted://";
 

@@ -26,8 +26,8 @@ const SetupRequired = () => {
         <Text style={styles.title}>Setup Required</Text>
         <Text style={styles.subtitle}>
           Copy <Text style={styles.accent}>.env.example</Text> to{" "}
-          <Text style={styles.accent}>.env</Text> and add your Posted credentials from the Posted panel
-          before running this example.
+          <Text style={styles.accent}>.env</Text> and add your Posted credentials from the Posted
+          panel before running this example.
         </Text>
         <View style={styles.divider} />
         <Text style={styles.code}>EXPO_PUBLIC_POSTED_API_KEY=...</Text>
@@ -37,7 +37,7 @@ const SetupRequired = () => {
   );
 };
 
-export const detourConfig: Config = {
+export const postedConfig: Config = {
   apiKey: process.env.EXPO_PUBLIC_POSTED_API_KEY!,
   appID: process.env.EXPO_PUBLIC_POSTED_APP_ID!,
   shouldUseClipboard: true,
@@ -91,7 +91,7 @@ export default function RootLayout() {
   }
 
   return (
-    <PostedProvider config={detourConfig}>
+    <PostedProvider config={postedConfig}>
       <RootNavigator />
     </PostedProvider>
   );

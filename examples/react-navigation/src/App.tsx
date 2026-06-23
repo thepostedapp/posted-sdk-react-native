@@ -4,14 +4,13 @@ import { Text, View } from "react-native";
 
 import * as SplashScreen from "expo-splash-screen";
 
-import { type LinkingOptions, NavigationContainer } from "@react-navigation/native";
-
 import {
   type Config,
   POSTED_LINKING_PREFIX,
   Posted,
   PostedProvider,
 } from "@posted-sdk/react-native";
+import { type LinkingOptions, NavigationContainer } from "@react-navigation/native";
 
 import { Navigation, type RootStackParamList, linkingConfig } from "./navigation";
 import { styles } from "./styles";

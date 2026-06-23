@@ -1,8 +1,7 @@
 import { Image, ScrollView, Text, View } from "react-native";
 
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-
 import { usePostedContext } from "@posted-sdk/react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { colors, styles } from "./styles";
 
@@ -33,8 +32,8 @@ export const Screen = () => {
         <View style={styles.card}>
           <Text style={styles.title}>Posted Expo Bare Example</Text>
           <Text style={styles.subtitle}>
-            Add credentials from the posted-sdk panel to{" "}
-            <Text style={styles.accent}>.env</Text> before testing.
+            Add credentials from the posted-sdk panel to <Text style={styles.accent}>.env</Text>{" "}
+            before testing.
           </Text>
 
           <View style={styles.divider} />

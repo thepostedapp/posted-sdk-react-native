@@ -9,8 +9,8 @@ import {
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const ONBOARDING_KEY = "detour_onboarding_seen";
-const AUTH_KEY = "detour_is_signed_in";
+const ONBOARDING_KEY = "posted_onboarding_seen";
+const AUTH_KEY = "posted_is_signed_in";
 
 type AuthContextType = {
   isLoaded: boolean;

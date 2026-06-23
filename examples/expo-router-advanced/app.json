@@ -1,22 +1,22 @@
 {
   "expo": {
-    "name": "Detour Expo Router Advanced",
-    "slug": "detour-expo-router-advanced",
+    "name": "Posted Expo Router Advanced",
+    "slug": "posted-expo-router-advanced",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/detour-logo.png",
+    "icon": "./assets/posted-logo.png",
     "newArchEnabled": true,
-    "scheme": "detour-expo-router-advanced",
+    "scheme": "posted-expo-router-advanced",
     "ios": {
-      "bundleIdentifier": "detourreactnative.exporouteradvanced",
+      "bundleIdentifier": "com.postedapp.exporouteradvanced",
       "supportsTablet": true,
-      "icon": "./assets/detour-logo.png",
-      "associatedDomains": ["applinks:<your-org>.godetour.link"]
+      "icon": "./assets/posted-logo.png",
+      "associatedDomains": ["applinks:<your-org>.postedapp.link"]
     },
     "android": {
-      "package": "detourreactnative.exporouteradvanced",
+      "package": "com.postedapp.exporouteradvanced",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/detour-logo.png",
+        "foregroundImage": "./assets/posted-logo.png",
         "backgroundColor": "#0C1221"
       },
       "edgeToEdgeEnabled": true,
@@ -27,7 +27,7 @@
           "data": [
             {
               "scheme": "https",
-              "host": "<your-org>.godetour.link",
+              "host": "<your-org>.postedapp.link",
               "pathPrefix": "/<your-app-hash>"
             }
           ],
@@ -41,10 +41,10 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#0C1221",
-          "image": "./assets/detour-logo-transparent.png",
+          "image": "./assets/posted-logo-transparent.png",
           "imageWidth": 120,
           "android": {
-            "image": "./assets/detour-logo-transparent.png",
+            "image": "./assets/posted-logo-transparent.png",
             "imageWidth": 120
           }
         }

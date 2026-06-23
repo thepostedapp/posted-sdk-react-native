@@ -6,14 +6,14 @@ import { type Router, Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import * as SystemUI from "expo-system-ui";
 
-import { type Config, DetourProvider, useDetourContext } from "@swmansion/react-native-detour";
+import { type Config, PostedProvider, usePostedContext } from "@posted-sdk/react-native";
 
 import { colors, styles } from "../styles";
 
 type AppHref = Parameters<Router["replace"]>[0];
 
 const hasCredentials =
-  !!process.env.EXPO_PUBLIC_DETOUR_API_KEY && !!process.env.EXPO_PUBLIC_DETOUR_APP_ID;
+  !!process.env.EXPO_PUBLIC_POSTED_API_KEY && !!process.env.EXPO_PUBLIC_POSTED_APP_ID;
 
 const SetupRequired = () => {
   useEffect(() => {
@@ -26,20 +26,20 @@ const SetupRequired = () => {
         <Text style={styles.title}>Setup Required</Text>
         <Text style={styles.subtitle}>
           Copy <Text style={styles.accent}>.env.example</Text> to{" "}
-          <Text style={styles.accent}>.env</Text> and add your Detour credentials from the panel
+          <Text style={styles.accent}>.env</Text> and add your Posted credentials from the Posted panel
           before running this example.
         </Text>
         <View style={styles.divider} />
-        <Text style={styles.code}>EXPO_PUBLIC_DETOUR_API_KEY=...</Text>
-        <Text style={styles.code}>EXPO_PUBLIC_DETOUR_APP_ID=...</Text>
+        <Text style={styles.code}>EXPO_PUBLIC_POSTED_API_KEY=...</Text>
+        <Text style={styles.code}>EXPO_PUBLIC_POSTED_APP_ID=...</Text>
       </View>
     </View>
   );
 };
 
 export const detourConfig: Config = {
-  apiKey: process.env.EXPO_PUBLIC_DETOUR_API_KEY!,
-  appID: process.env.EXPO_PUBLIC_DETOUR_APP_ID!,
+  apiKey: process.env.EXPO_PUBLIC_POSTED_API_KEY!,
+  appID: process.env.EXPO_PUBLIC_POSTED_APP_ID!,
   shouldUseClipboard: true,
   linkProcessingMode: "deferred-only",
 };
@@ -48,10 +48,10 @@ SplashScreen.preventAutoHideAsync();
 SystemUI.setBackgroundColorAsync(colors.background);
 
 // Root navigator handles all deep link navigation after SDK processing.
-// Universal / App links are resolved in +native-intent.tsx (mapToRoute strips the Detour hash).
-// Only deferred links go through DetourProvider (linkProcessingMode: "deferred-only").
+// Universal / App links are resolved in +native-intent.tsx (mapToRoute strips the Posted hash).
+// Only deferred links go through PostedProvider (linkProcessingMode: "deferred-only").
 const RootNavigator = () => {
-  const { isLinkProcessed, link, clearLink } = useDetourContext();
+  const { isLinkProcessed, link, clearLink } = usePostedContext();
   const router = useRouter();
 
   useEffect(() => {
@@ -91,8 +91,8 @@ export default function RootLayout() {
   }
 
   return (
-    <DetourProvider config={detourConfig}>
+    <PostedProvider config={detourConfig}>
       <RootNavigator />
-    </DetourProvider>
+    </PostedProvider>
   );
 }

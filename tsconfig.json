@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
     "paths": {
-      "@swmansion/react-native-detour": ["./packages/react-native-detour/src/index"],
-      "@swmansion/react-native-detour/expo-router": [
-        "./packages/react-native-detour/src/expo-router/index"
+      "@posted-sdk/react-native": ["./packages/react-native-posted-sdk/src/index"],
+      "@posted-sdk/react-native/expo-router": [
+        "./packages/react-native-posted-sdk/src/expo-router/index"
       ]
     },
     "allowUnreachableCode": false,

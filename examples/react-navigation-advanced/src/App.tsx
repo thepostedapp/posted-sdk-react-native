@@ -9,17 +9,17 @@ import { type LinkingOptions, NavigationContainer } from "@react-navigation/nati
 
 import {
   type Config,
-  DETOUR_LINKING_PREFIX,
-  Detour,
-  DetourProvider,
-} from "@swmansion/react-native-detour";
+  POSTED_LINKING_PREFIX,
+  Posted,
+  PostedProvider,
+} from "@posted-sdk/react-native";
 
 import { AuthProvider } from "./auth";
 import { Navigation, type RootStackParamList, linkingConfig } from "./navigation";
 import { colors, styles } from "./styles";
 
 const hasCredentials =
-  !!process.env.EXPO_PUBLIC_DETOUR_API_KEY && !!process.env.EXPO_PUBLIC_DETOUR_APP_ID;
+  !!process.env.EXPO_PUBLIC_POSTED_API_KEY && !!process.env.EXPO_PUBLIC_POSTED_APP_ID;
 
 const SetupRequired = () => {
   useEffect(() => {
@@ -32,20 +32,20 @@ const SetupRequired = () => {
         <Text style={styles.title}>Setup Required</Text>
         <Text style={styles.subtitle}>
           Copy <Text style={styles.accent}>.env.example</Text> to{" "}
-          <Text style={styles.accent}>.env</Text> and add your Detour credentials from the panel
+          <Text style={styles.accent}>.env</Text> and add your posted-sdk credentials from the panel
           before running this example.
         </Text>
         <View style={styles.divider} />
-        <Text style={styles.code}>EXPO_PUBLIC_DETOUR_API_KEY=...</Text>
-        <Text style={styles.code}>EXPO_PUBLIC_DETOUR_APP_ID=...</Text>
+        <Text style={styles.code}>EXPO_PUBLIC_POSTED_API_KEY=...</Text>
+        <Text style={styles.code}>EXPO_PUBLIC_POSTED_APP_ID=...</Text>
       </View>
     </View>
   );
 };
 
-export const detourConfig: Config = {
-  apiKey: process.env.EXPO_PUBLIC_DETOUR_API_KEY!,
-  appID: process.env.EXPO_PUBLIC_DETOUR_APP_ID!,
+export const postedConfig: Config = {
+  apiKey: process.env.EXPO_PUBLIC_POSTED_API_KEY!,
+  appID: process.env.EXPO_PUBLIC_POSTED_APP_ID!,
   shouldUseClipboard: true,
 };
 
@@ -55,13 +55,13 @@ SystemUI.setBackgroundColorAsync(colors.background);
 const AppRoot = () => {
   const linking = useMemo<LinkingOptions<RootStackParamList>>(
     () => ({
-      prefixes: [DETOUR_LINKING_PREFIX],
+      prefixes: [POSTED_LINKING_PREFIX],
       config: linkingConfig,
       async getInitialURL() {
-        return await Detour.getInitialURL();
+        return await Posted.getInitialURL();
       },
       subscribe(listener) {
-        const subscription = Detour.addEventListener("url", ({ url }) => {
+        const subscription = Posted.addEventListener("url", ({ url }) => {
           listener(url);
         });
 
@@ -105,9 +105,9 @@ export function App() {
 
   return (
     <AuthProvider>
-      <DetourProvider config={detourConfig}>
+      <PostedProvider config={postedConfig}>
         <AppRoot />
-      </DetourProvider>
+      </PostedProvider>
     </AuthProvider>
   );
 }

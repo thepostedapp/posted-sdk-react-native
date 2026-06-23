@@ -17,7 +17,7 @@ export function Onboarding() {
       style={{ flex: 1, backgroundColor: colors.background }}
       contentContainerStyle={styles.scrollContent}
     >
-      <LinkTestingCard title="Test Detour Links" />
+      <LinkTestingCard title="Test Posted Links" />
 
       <Pressable
         onPress={handleGetStarted}

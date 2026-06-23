@@ -1,22 +1,18 @@
-<img src="https://github.com/user-attachments/assets/c965b51b-7307-477a-8d22-9c9cd6da6231" alt="React Native Detour by Software Mansion" width="100%"/>
+<img src="https://github.com/user-attachments/assets/c965b51b-7307-477a-8d22-9c9cd6da6231" alt="posted-sdk React Native" width="100%"/>
 
-[![Ad](https://revive-adserver.swmansion.com/www/images/zone-gh-react-native-detour-1?n=1)](https://revive-adserver.swmansion.com/www/delivery/ck.php?zoneid=zone-gh-react-native-detour-1&n=1)
-[![Ad](https://revive-adserver.swmansion.com/www/images/zone-gh-react-native-detour-2?n=1)](https://revive-adserver.swmansion.com/www/delivery/ck.php?zoneid=zone-gh-react-native-detour-2&n=1)
-[![Ad](https://revive-adserver.swmansion.com/www/images/zone-gh-react-native-detour-3?n=1)](https://revive-adserver.swmansion.com/www/delivery/ck.php?zoneid=zone-gh-react-native-detour-3&n=1)
+# posted-sdk React Native
 
-# React Native Detour
-
-React Native Detour is an SDK for handling deferred deep links in React Native. A deferred link works like a regular deep link, but survives the App Store or Play Store install — a user who clicks a link before having the app installed is redirected to the right screen on first launch. Detour also handles Universal/App links and custom scheme links in a single unified API.
+posted-sdk React Native (`@posted-sdk/react-native`) is an SDK for handling deferred deep links in React Native. A deferred link works like a regular deep link, but survives the App Store or Play Store install — a user who clicks a link before having the app installed is redirected to the right screen on first launch. The SDK also handles Universal/App links and custom scheme links in a single unified API.
 
 ## Quick links
 
-- Documentation: [https://detour.swmansion.com/docs/](https://detour.swmansion.com/docs/)
-- Installation guide: [https://detour.swmansion.com/docs/sdk/react-native/sdk-installation](https://detour.swmansion.com/docs/sdk/react-native/sdk-installation)
+- Documentation: [https://postedapp.com/docs/](https://postedapp.com/docs/) <!-- TODO(B6): update when new docs URL is live -->
+- Installation guide: [https://postedapp.com/docs/sdk/react-native/sdk-installation](https://postedapp.com/docs/sdk/react-native/sdk-installation) <!-- TODO(B6): update when new docs URL is live -->
 
 ## Create an account
 
-You need a Detour account to generate app credentials and configure your links.  
-Sign up here: [https://godetour.dev/auth/signup](https://godetour.dev/auth/signup)
+You need a posted-sdk account to generate app credentials and configure your links.  
+<!-- TODO(B3): update sign-up URL once new backend domain is live -->
 
 ## Installation
 
@@ -25,7 +21,7 @@ Sign up here: [https://godetour.dev/auth/signup](https://godetour.dev/auth/signu
 Install the SDK:
 
 ```sh
-npm install @swmansion/react-native-detour
+npm install @posted-sdk/react-native
 ```
 
 ### Additional dependencies
@@ -46,7 +42,7 @@ npm install react-native-device-info
 
 ### Bare React Native CLI (without Expo)
 
-Detour's peer dependencies are Expo Modules (they ship native code). In a bare React Native CLI project, add Expo Modules once and point Metro at `expo/metro-config`:
+The SDK's peer dependencies are Expo Modules (they ship native code). In a bare React Native CLI project, add Expo Modules once and point Metro at `expo/metro-config`:
 
 ```sh
 npx install-expo-modules@latest
@@ -61,19 +57,17 @@ const { mergeConfig } = require("@react-native/metro-config");
 module.exports = mergeConfig(getDefaultConfig(__dirname), {});
 ```
 
-Then rebuild — `DetourProvider` and the hooks work exactly as in the Expo examples.
-
-See [Expo Modules setup](https://detour.swmansion.com/docs/sdk/react-native/sdk-installation#expo-modules-setup-react-native-cli) for the full walkthrough, and [build issues](https://detour.swmansion.com/docs/sdk/react-native/testing#bare-react-native-cli-build-issues) if you hit setup errors.
+Then rebuild — `PostedProvider` and the hooks work exactly as in the Expo examples.
 
 ## Usage
 
-Mount `DetourProvider` at the root of your app and configure it with your credentials. How you consume the resolved link depends on your navigation library.
+Mount `PostedProvider` at the root of your app and configure it with your credentials. How you consume the resolved link depends on your navigation library.
 
-> The SDK is a no-op on Expo Web — `DetourProvider` mounts but link processing is skipped and `isLinkProcessed` resolves immediately to `true`.
+> The SDK is a no-op on Expo Web — `PostedProvider` mounts but link processing is skipped and `isLinkProcessed` resolves immediately to `true`.
 
 ### Expo Router
 
-Wrap your root layout with `DetourProvider`, then use the `useDetourContext` hook to read the resolved link and drive navigation. If your app uses Expo Router's `+native-intent.tsx` to handle Universal/App links, import `createDetourNativeIntentHandler` from `@swmansion/react-native-detour/expo-router` and set `linkProcessingMode: 'deferred-only'` — Detour will only handle deferred links and let the native intent handler take care of the rest. See [`examples/expo-router-native-intent`](./examples/expo-router-native-intent) for a working setup.
+Wrap your root layout with `PostedProvider`, then use the `usePostedContext` hook to read the resolved link and drive navigation. If your app uses Expo Router's `+native-intent.tsx` to handle Universal/App links, import `createPostedNativeIntentHandler` from `@posted-sdk/react-native/expo-router` and set `linkProcessingMode: 'deferred-only'` — the SDK will only handle deferred links and let the native intent handler take care of the rest. See [`examples/expo-router-native-intent`](./examples/expo-router-native-intent) for a working setup.
 
 <details>
 <summary>Expo Router example</summary>
@@ -82,7 +76,7 @@ Wrap your root layout with `DetourProvider`, then use the `useDetourContext` hoo
 import { Stack, usePathname, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 
-import { type Config, DetourProvider, useDetourContext } from "@swmansion/react-native-detour";
+import { type Config, PostedProvider, usePostedContext } from "@posted-sdk/react-native";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -93,14 +87,14 @@ const config: Config = {
 
 export default function RootLayout() {
   return (
-    <DetourProvider config={config}>
+    <PostedProvider config={config}>
       <RootNavigator />
-    </DetourProvider>
+    </PostedProvider>
   );
 }
 
 function RootNavigator() {
-  const { isLinkProcessed, link, clearLink } = useDetourContext();
+  const { isLinkProcessed, link, clearLink } = usePostedContext();
   const pathname = usePathname();
   const router = useRouter();
 
@@ -133,7 +127,7 @@ function RootNavigator() {
 
 #### v2.3.0 and later
 
-Pass Detour's linking adapter to `NavigationContainer`. React Navigation will handle routing automatically — `useDetourContext` is not needed for basic usage. The splash screen is hidden via `onReady`, which fires after `getInitialURL` resolves.
+Pass the SDK's linking adapter to `NavigationContainer`. React Navigation will handle routing automatically — `usePostedContext` is not needed for basic usage. The splash screen is hidden via `onReady`, which fires after `getInitialURL` resolves.
 
 <details>
 <summary>React Navigation example</summary>
@@ -145,10 +139,10 @@ import { NavigationContainer } from "@react-navigation/native";
 
 import {
   type Config,
-  DETOUR_LINKING_PREFIX,
-  Detour,
-  DetourProvider,
-} from "@swmansion/react-native-detour";
+  POSTED_LINKING_PREFIX,
+  Posted,
+  PostedProvider,
+} from "@posted-sdk/react-native";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -158,12 +152,12 @@ const config: Config = {
 };
 
 const linking = {
-  prefixes: [DETOUR_LINKING_PREFIX],
+  prefixes: [POSTED_LINKING_PREFIX],
   async getInitialURL() {
-    return await Detour.getInitialURL();
+    return await Posted.getInitialURL();
   },
   subscribe(listener) {
-    const subscription = Detour.addEventListener("url", ({ url }) => {
+    const subscription = Posted.addEventListener("url", ({ url }) => {
       listener(url);
     });
     return () => subscription.remove();
@@ -172,11 +166,11 @@ const linking = {
 
 export function App() {
   return (
-    <DetourProvider config={config}>
+    <PostedProvider config={config}>
       <NavigationContainer linking={linking} onReady={() => SplashScreen.hideAsync()}>
         <Navigation />
       </NavigationContainer>
-    </DetourProvider>
+    </PostedProvider>
   );
 }
 ```
@@ -185,7 +179,7 @@ export function App() {
 
 #### Before v2.3.0
 
-Use `useDetourContext` and call your navigator imperatively, the same way as the [Expo Router approach](#expo-router) above.
+Use `usePostedContext` and call your navigator imperatively, the same way as the [Expo Router approach](#expo-router) above.
 
 #### Auth-gated apps
 
@@ -221,9 +215,7 @@ A deep link that arrives while the user is signed-out is parsed, found unreachab
 
 See the [React Navigation deep linking docs](https://reactnavigation.org/docs/deep-linking?config=static#integrating-with-other-tools).
 
-Learn more from our [docs](https://detour.swmansion.com/docs/sdk/react-native/sdk-usage).
-
-### Controlling which links Detour processes
+### Controlling which links the SDK processes
 
 Use `linkProcessingMode` to control which link sources the SDK listens to:
 
@@ -256,25 +248,23 @@ If your app redirects based on `link` (especially in entry screens), call `clear
 
 ## Analytics
 
-The SDK includes a built-in analytics module. `DetourProvider` automatically tracks app opens for retention. You can also log custom events using the predefined `DetourEventNames` enum:
+The SDK includes a built-in analytics module. `PostedProvider` automatically tracks app opens for retention. You can also log custom events using the predefined `PostedEventNames` enum:
 
 <details>
 <summary>Analytics example</summary>
 
 ```ts
-import { DetourAnalytics, DetourEventNames } from "@swmansion/react-native-detour";
+import { PostedAnalytics, PostedEventNames } from "@posted-sdk/react-native";
 
-DetourAnalytics.logEvent(DetourEventNames.Purchase);
-DetourAnalytics.logRetention("week_1");
+PostedAnalytics.logEvent(PostedEventNames.Purchase);
+PostedAnalytics.logRetention("week_1");
 ```
 
 </details>
 
-See the [analytics docs](https://detour.swmansion.com/docs/Fundamentals/analytics-detour) for the full event list and retention tracking setup.
-
 ## Examples
 
-All example apps with Detour SDK integrated live in `examples/`:
+All example apps with the SDK integrated live in `examples/`:
 
 | Example                              | Description                                                    |
 | ------------------------------------ | -------------------------------------------------------------- |
@@ -306,7 +296,7 @@ pnpm examples:react-navigation-advanced ios
 These are aliases for `pnpm --filter <package-name> <script>`. You can also target examples directly using the workspace filter flag:
 
 ```sh
-pnpm --filter @swmansion/react-native-detour-expo-router ios
+pnpm --filter @posted-sdk/react-native-expo-router ios
 ```
 
 Or navigate into an example and run scripts there:
@@ -325,7 +315,7 @@ The package exposes several types to help you with type-checking in your own cod
 
 ### Config
 
-This type is used to define the configuration object you pass to the DetourProvider.
+This type is used to define the configuration object you pass to `PostedProvider`.
 
 <details>
 <summary>Config type</summary>
@@ -333,12 +323,12 @@ This type is used to define the configuration object you pass to the DetourProvi
 ```ts
 export type Config = {
   /**
-   * Your application ID from the Detour dashboard.
+   * Your application ID from the posted-sdk dashboard.
    */
   appID: string;
 
   /**
-   * Your API key from the Detour dashboard.
+   * Your API key from the posted-sdk dashboard.
    */
   apiKey: string;
 
@@ -363,21 +353,21 @@ export type Config = {
   /**
    * Optional: A custom storage adapter. Defaults to AsyncStorage if not provided.
    */
-  storage?: DetourStorage;
+  storage?: PostedStorage;
 };
 ```
 
 </details>
 
-### DetourContextType
+### PostedContextType
 
-This type represents the object returned by the `useDetourContext` hook, containing the resolved link and its processing status.
+This type represents the object returned by the `usePostedContext` hook, containing the resolved link and its processing status.
 
 <details>
-<summary>DetourContextType type</summary>
+<summary>PostedContextType type</summary>
 
 ```ts
-export type DetourContextType = {
+export type PostedContextType = {
   /**
    * Boolean indicating if the initial link (deferred, Universal/App Link, or scheme) has been processed.
    * Use this to gate navigation or hide the splash screen.
@@ -387,7 +377,7 @@ export type DetourContextType = {
   /**
    * The resolved link object, or null if no link was found.
    */
-  link: DetourLink;
+  link: PostedLink;
 
   /**
    * Resets the link to null. Call this after you handle a link.
@@ -398,15 +388,15 @@ export type DetourContextType = {
 
 </details>
 
-### DetourLink
+### PostedLink
 
 The resolved link object, or null if no link was found.
 
 <details>
-<summary>DetourLink type</summary>
+<summary>PostedLink type</summary>
 
 ```ts
-export type DetourLink = {
+export type PostedLink = {
   /** The original link URL as received by the SDK. */
   url: string | URL;
 
@@ -421,7 +411,7 @@ export type DetourLink = {
 
   /**
    * The type of the detected link:
-   * - 'deferred': resolved from the Detour API on first app install
+   * - 'deferred': resolved from the posted-sdk API on first app install
    * - 'verified': Universal Link (iOS) or App Link (Android)
    * - 'scheme': custom scheme deep link (only when linkProcessingMode is 'all')
    */
@@ -437,40 +427,53 @@ export type DetourLink = {
 <summary>React Navigation adapter types</summary>
 
 ```ts
-export const DETOUR_LINKING_PREFIX: string; // "detour://"
+export const POSTED_LINKING_PREFIX: string; // "posted://"
 
-export type DetourUrlEvent = {
+export type PostedUrlEvent = {
   url: string;
 };
 
-export type DetourUrlSubscription = {
+export type PostedUrlSubscription = {
   remove: () => void;
 };
 ```
 
 ```ts
-Detour.getInitialURL(): Promise<string | undefined>
-Detour.addEventListener("url", (event: DetourUrlEvent) => void): DetourUrlSubscription
+Posted.getInitialURL(): Promise<string | undefined>
+Posted.addEventListener("url", (event: PostedUrlEvent) => void): PostedUrlSubscription
 ```
 
 </details>
 
-## Other Detour SDKs
+## Migrating from `@swmansion/react-native-detour`
 
-Detour is also available for other app stacks:
+The package has been renamed. Update your imports:
 
-- Android SDK: [https://github.com/software-mansion-labs/android-detour](https://github.com/software-mansion-labs/android-detour)
-- iOS SDK: [https://github.com/software-mansion-labs/ios-detour](https://github.com/software-mansion-labs/ios-detour)
-- Flutter SDK: [https://github.com/software-mansion-labs/detour-flutter-plugin](https://github.com/software-mansion-labs/detour-flutter-plugin)
+| Old (`@swmansion/react-native-detour`) | New (`@posted-sdk/react-native`) |
+| -------------------------------------- | -------------------------------- |
+| `DetourProvider` | `PostedProvider` |
+| `useDetourContext` | `usePostedContext` |
+| `Detour` | `Posted` |
+| `DETOUR_LINKING_PREFIX` | `POSTED_LINKING_PREFIX` |
+| `DetourAnalytics` | `PostedAnalytics` |
+| `DetourEventNames` | `PostedEventNames` |
+| `DetourContextType` | `PostedContextType` |
+| `DetourLink` | `PostedLink` |
+| `DetourStorage` | `PostedStorage` |
+| `createDetourNativeIntentHandler` | `createPostedNativeIntentHandler` |
+
+The old names are exported as deprecated re-exports in `2.0.0` for one minor cycle to ease migration.
+
+## Other posted-sdk SDKs
+
+posted-sdk is also available for other app stacks:
+
+- Android SDK: [https://github.com/posted-sdk/android](https://github.com/posted-sdk/android) <!-- TODO(B7): update when GitHub org is renamed -->
+- iOS SDK: [https://github.com/posted-sdk/ios](https://github.com/posted-sdk/ios) <!-- TODO(B7): update when GitHub org is renamed -->
+- Flutter SDK: [https://github.com/posted-sdk/flutter](https://github.com/posted-sdk/flutter) <!-- TODO(B7): update when GitHub org is renamed -->
 
 ---
 
 ## License
 
 This library is licensed under [The MIT License](./LICENSE).
-
-## React Native Detour is created by Software Mansion
-
-Since 2012, [Software Mansion](https://swmansion.com) is a software agency with experience in building web and mobile apps. We are Core React Native Contributors and experts in dealing with all kinds of React Native issues. We can help you build your next dream product – [Hire us](https://swmansion.com/contact/projects?utm_source=detour&utm_medium=readme).
-
-[![swm](https://logo.swmansion.com/logo?color=white&variant=desktop&width=150&tag=react-native-detour-github "Software Mansion")](https://swmansion.com)

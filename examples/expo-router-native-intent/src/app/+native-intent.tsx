@@ -1,8 +1,9 @@
-import { createDetourNativeIntentHandler } from "@swmansion/react-native-detour/expo-router";
+import { createPostedNativeIntentHandler } from "@posted-sdk/react-native/expo-router";
 
 import { detourConfig } from "./_layout";
 
-const detourNativeIntentHandler = createDetourNativeIntentHandler({
+// TODO(B4): update host pattern to new short-link domain once confirmed.
+const postedNativeIntentHandler = createPostedNativeIntentHandler({
   hosts: [/\.godetour\.link$/i],
   config: detourConfig,
   mapToRoute: ({ resolvedUrl }) => {
@@ -19,9 +20,9 @@ const detourNativeIntentHandler = createDetourNativeIntentHandler({
 });
 
 export async function redirectSystemPath(args: { path: string; initial: boolean }) {
-  const result = await detourNativeIntentHandler(args);
+  const result = await postedNativeIntentHandler(args);
 
-  // Scheme URLs bypass Detour (deferred-only mode) — tag them for display purposes
+  // Scheme URLs bypass Posted (deferred-only mode) — tag them for display purposes
   if (result === args.path) {
     try {
       const url = new URL(args.path);

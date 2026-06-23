@@ -6,14 +6,14 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import * as SystemUI from "expo-system-ui";
 
-import { type Config, DetourProvider } from "@swmansion/react-native-detour";
+import { type Config, PostedProvider } from "@posted-sdk/react-native";
 
 import { AuthProvider, useAuth } from "../auth";
 import { colors, styles } from "../styles";
-import { useDetourGate } from "../useDetourGate";
+import { usePostedGate } from "../usePostedGate";
 
 const hasCredentials =
-  !!process.env.EXPO_PUBLIC_DETOUR_API_KEY && !!process.env.EXPO_PUBLIC_DETOUR_APP_ID;
+  !!process.env.EXPO_PUBLIC_POSTED_API_KEY && !!process.env.EXPO_PUBLIC_POSTED_APP_ID;
 
 const SetupRequired = () => {
   useEffect(() => {
@@ -26,20 +26,20 @@ const SetupRequired = () => {
         <Text style={styles.title}>Setup Required</Text>
         <Text style={styles.subtitle}>
           Copy <Text style={styles.accent}>.env.example</Text> to{" "}
-          <Text style={styles.accent}>.env</Text> and add your Detour credentials from the panel
+          <Text style={styles.accent}>.env</Text> and add your Posted credentials from the Posted panel
           before running this example.
         </Text>
         <View style={styles.divider} />
-        <Text style={styles.code}>EXPO_PUBLIC_DETOUR_API_KEY=...</Text>
-        <Text style={styles.code}>EXPO_PUBLIC_DETOUR_APP_ID=...</Text>
+        <Text style={styles.code}>EXPO_PUBLIC_POSTED_API_KEY=...</Text>
+        <Text style={styles.code}>EXPO_PUBLIC_POSTED_APP_ID=...</Text>
       </View>
     </View>
   );
 };
 
 export const detourConfig: Config = {
-  apiKey: process.env.EXPO_PUBLIC_DETOUR_API_KEY!,
-  appID: process.env.EXPO_PUBLIC_DETOUR_APP_ID!,
+  apiKey: process.env.EXPO_PUBLIC_POSTED_API_KEY!,
+  appID: process.env.EXPO_PUBLIC_POSTED_APP_ID!,
   shouldUseClipboard: true,
 };
 
@@ -53,7 +53,7 @@ const rootScreenOptions = {
 
 const AppStack = () => {
   const { isSignedIn } = useAuth();
-  useDetourGate();
+  usePostedGate();
 
   return (
     <Stack screenOptions={rootScreenOptions}>
@@ -75,9 +75,9 @@ export default function RootLayout() {
 
   return (
     <AuthProvider>
-      <DetourProvider config={detourConfig}>
+      <PostedProvider config={detourConfig}>
         <AppStack />
-      </DetourProvider>
+      </PostedProvider>
     </AuthProvider>
   );
 }

@@ -40,7 +40,7 @@ const headerOptions = {
 function HeaderTitle() {
   return (
     <Image
-      source={require("../../assets/detour-logo-transparent.png")}
+      source={require("../../assets/posted-logo-transparent.png")}
       style={{ width: 32, height: 32 }}
       resizeMode="contain"
     />

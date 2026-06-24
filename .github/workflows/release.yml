@@ -3,15 +3,15 @@ name: Release
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - "v*.*.*"
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     environment: npm-publish
     permissions:
-      contents: write  # needed to push release commit/tag if perform-git-operations is true
-      id-token: write  # required for npm provenance OIDC token
+      contents: write # needed to push release commit/tag if perform-git-operations is true
+      id-token: write # required for npm provenance OIDC token
     concurrency:
       group: publish-${{ github.ref }}
       cancel-in-progress: false
@@ -31,12 +31,9 @@ jobs:
         run: pnpm build
 
       - name: Publish to npm
-        uses: software-mansion/npm-package-publish@22b6e632b4310c5c061a047bccc99d0cea88d2bb
-        with:
-          package-name: '@swmansion/react-native-detour'
-          package-json-path: packages/react-native-detour/package.json
-          release-type: stable
-          version: ${{ steps.version.outputs.version }}
-          perform-git-operations: false
-          dry-run: false
-          install-dependencies-command: echo "dependencies already installed"
+        run: |
+          cd packages/react-native-posted-sdk
+          npm version ${{ steps.version.outputs.version }} --no-git-tag-version
+          npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

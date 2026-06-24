@@ -13,38 +13,34 @@ export default function HomeScreen() {
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <View style={[headerStyles.header, { paddingTop: insets.top }]}>
         <Image
-          source={require("../../assets/detour-logo-transparent.png")}
+          source={require("../../assets/posted-logo-transparent.png")}
           style={{ width: 32, height: 32 }}
           resizeMode="contain"
         />
       </View>
       <ScrollView contentContainerStyle={styles.screen}>
         <View style={styles.card}>
-          <Text style={styles.title}>Detour Example</Text>
+          <Text style={styles.title}>Posted Example</Text>
           <Text style={styles.subtitle}>
-            Add credentials from the Detour panel to <Text style={styles.accent}>.env</Text> before
-            testing.
+            Add credentials from the posted-sdk panel to <Text style={styles.accent}>.env</Text>{" "}
+            before testing.
           </Text>
 
           <View style={styles.divider} />
 
           <Text style={styles.sectionHeader}>Deferred Link</Text>
           <Text style={styles.bullet}>
-            Uninstall the app or clear its data, open a Detour link in the mobile browser, then
+            Uninstall the app or clear its data, open a Posted link in the mobile browser, then
             install and launch — the SDK resolves the link automatically.
           </Text>
-          <Text style={styles.code}>
-            https://&lt;your-org&gt;.godetour.link/&lt;hash&gt;/details
-          </Text>
+          <Text style={styles.code}>https://&lt;your-org&gt;.godetour.link/&lt;hash&gt;/details</Text>
 
           <Text style={styles.sectionHeader}>Universal / App Link</Text>
           <Text style={styles.bullet}>
             Open in browser or paste into Notes/Messages and tap — iOS/Android will launch the app
-            and Detour navigates to the target route.
+            and Posted navigates to the target route.
           </Text>
-          <Text style={styles.code}>
-            https://&lt;your-org&gt;.godetour.link/&lt;hash&gt;/details
-          </Text>
+          <Text style={styles.code}>https://&lt;your-org&gt;.godetour.link/&lt;hash&gt;/details</Text>
 
           <View style={styles.divider} />
 

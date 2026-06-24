@@ -1,3 +1,3 @@
-import { createDetourNativeIntentHandler } from "@swmansion/react-native-detour/expo-router";
+import { createPostedNativeIntentHandler } from "@posted-sdk/react-native/expo-router";
 
-export const redirectSystemPath = createDetourNativeIntentHandler();
+export const redirectSystemPath = createPostedNativeIntentHandler();

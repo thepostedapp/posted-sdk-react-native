@@ -15,7 +15,7 @@ export function Home() {
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <LinkTestingCard title="Detour Example" />
+        <LinkTestingCard title="Posted Example" />
       </ScrollView>
 
       <View style={{ flexDirection: "row", gap: 12, padding: 16 }}>

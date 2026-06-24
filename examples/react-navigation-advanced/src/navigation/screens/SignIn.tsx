@@ -1,20 +1,20 @@
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
-import { useDetourContext } from "@swmansion/react-native-detour";
+import { usePostedContext } from "@posted-sdk/react-native";
 
 import { useAuth } from "../../auth";
 import { colors, styles } from "../../styles";
 
 export function SignIn() {
   const { signIn } = useAuth();
-  const { link } = useDetourContext();
+  const { link } = usePostedContext();
 
   return (
     <View style={styles.screen}>
       {link && (
         <View style={[styles.card, styles.banner]}>
           <Text style={styles.sectionHeader}>Link pending</Text>
-          <Text style={styles.bullet}>A Detour link is waiting — sign in to continue.</Text>
+          <Text style={styles.bullet}>A Posted link is waiting — sign in to continue.</Text>
         </View>
       )}
 
@@ -25,7 +25,7 @@ export function SignIn() {
 
         <TextInput
           style={inputStyles.input}
-          value="demo@godetour.dev"
+          value="demo@postedapp.com"
           editable={false}
           placeholderTextColor={colors.muted}
         />

@@ -1,13 +1,13 @@
 {
-  "name": "react-native-detour-monorepo",
+  "name": "react-native-posted-sdk-monorepo",
   "private": true,
   "packageManager": "pnpm@10.11.0",
   "scripts": {
-    "build": "pnpm --filter @swmansion/react-native-detour prepare",
-    "test": "pnpm --filter @swmansion/react-native-detour test",
-    "typecheck": "pnpm --filter @swmansion/react-native-detour typecheck",
+    "build": "pnpm --filter @posted-sdk/react-native prepare",
+    "test": "pnpm --filter @posted-sdk/react-native test",
+    "typecheck": "pnpm --filter @posted-sdk/react-native typecheck",
     "lint": "eslint . --cache --cache-location .eslintcache",
-    "release": "pnpm --filter @swmansion/react-native-detour release",
+    "release": "pnpm --filter @posted-sdk/react-native release",
     "prebuild:all": "pnpm --filter './examples/*' prebuild",
     "examples:expo-bare": "pnpm -C examples/expo-bare",
     "examples:react-navigation": "pnpm -C examples/react-navigation",

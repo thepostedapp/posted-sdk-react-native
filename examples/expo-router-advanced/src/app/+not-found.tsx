@@ -2,7 +2,7 @@ import { Text, View } from "react-native";
 
 import { Link, useLocalSearchParams } from "expo-router";
 
-import { useDetourContext } from "@swmansion/react-native-detour";
+import { usePostedContext } from "@posted-sdk/react-native";
 
 import { useAuth } from "../auth";
 import { styles } from "../styles";
@@ -11,7 +11,7 @@ export default function NotFoundScreen() {
   const { isSignedIn } = useAuth();
   const { path } = useLocalSearchParams<{ path?: string }>();
   const backHref = isSignedIn ? "/(app)/(tabs)" : "/sign-in";
-  const { link } = useDetourContext();
+  const { link } = usePostedContext();
 
   return (
     <View style={styles.screen}>
@@ -22,13 +22,13 @@ export default function NotFoundScreen() {
         {link && (
           <>
             <View style={styles.divider} />
-            <Text style={styles.sectionHeader}>Resolved Detour link</Text>
+            <Text style={styles.sectionHeader}>Resolved Posted link</Text>
             <Text style={styles.label}>
               url: <Text style={styles.value}>{String(link.url)}</Text>
             </Text>
             {link.route && (
               <Text style={styles.subtitle}>
-                Detour resolved this link to <Text style={styles.value}>{link.route}</Text>
+                Posted resolved this link to <Text style={styles.value}>{link.route}</Text>
                 {", "}but that path does not match any screen in the app.
               </Text>
             )}

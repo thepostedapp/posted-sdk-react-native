@@ -1,5 +1,5 @@
 {
-  "name": "@swmansion/react-native-detour-expo-router-native-intent",
+  "name": "@posted-sdk/react-native-expo-router-native-intent",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
@@ -12,7 +12,7 @@
   "dependencies": {
     "@expo/metro-runtime": "~55.0.9",
     "@react-native-async-storage/async-storage": "^2.2.0",
-    "@swmansion/react-native-detour": "workspace:*",
+    "@posted-sdk/react-native": "workspace:*",
     "expo": "~55.0.11",
     "expo-application": "*",
     "expo-clipboard": "*",

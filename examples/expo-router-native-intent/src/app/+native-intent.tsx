@@ -1,10 +1,11 @@
-import { createDetourNativeIntentHandler } from "@swmansion/react-native-detour/expo-router";
+import { createPostedNativeIntentHandler } from "@posted-sdk/react-native/expo-router";
 
-import { detourConfig } from "./_layout";
+import { postedConfig } from "./_layout";
 
-const detourNativeIntentHandler = createDetourNativeIntentHandler({
+// TODO(B4): update host pattern to new short-link domain once confirmed.
+const postedNativeIntentHandler = createPostedNativeIntentHandler({
   hosts: [/\.godetour\.link$/i],
-  config: detourConfig,
+  config: postedConfig,
   mapToRoute: ({ resolvedUrl }) => {
     // Example of a custom mapping function that transforms the resolved URL into an app route.
     // In this case, we cut the deeplink app hash and keep only the path and search params for routing.
@@ -19,9 +20,9 @@ const detourNativeIntentHandler = createDetourNativeIntentHandler({
 });
 
 export async function redirectSystemPath(args: { path: string; initial: boolean }) {
-  const result = await detourNativeIntentHandler(args);
+  const result = await postedNativeIntentHandler(args);
 
-  // Scheme URLs bypass Detour (deferred-only mode) — tag them for display purposes
+  // Scheme URLs bypass Posted (deferred-only mode) — tag them for display purposes
   if (result === args.path) {
     try {
       const url = new URL(args.path);

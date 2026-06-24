@@ -31,7 +31,7 @@ You need a Posted account to register this app and generate its credentials. <!-
 
 ### 1. Register the app
 
-Create an organization and add a new app. Posted assigns it a base link URL of the form `https://<your-org>.posted.link/<your-app-hash>` visible in **Link settings** section.
+Create an organization and add a new app. Posted assigns it a base link URL of the form `https://<your-org>.godetour.link/<your-app-hash>` visible in **Link settings** section.
 
 > In **Link settings**, the dashboard asks for a fallback Redirect URL to mark setup as complete. It only controls where **web** traffic lands — it has no effect on the deferred or Universal/App link flows these examples test, so it can be left empty or filled with a placeholder URL for local development. For production, see [Full app configuration](https://postedapp.com/docs/Fundamentals/getting-started#4-complete-app-configuration). <!-- TODO(B6): update when new docs URL is live -->
 
@@ -87,18 +87,18 @@ Replace the placeholders in `app.json` with the values from the dashboard's [App
 ```json
 "ios": {
   // ...
-  "associatedDomains": ["applinks:<your-org>.posted.link"]
+  "associatedDomains": ["applinks:<your-org>.godetour.link"]
 },
 "android": {
   // ...
   "intentFilters": [{
     // ...
-    "data": [{ "scheme": "https", "host": "<your-org>.posted.link", "pathPrefix": "/<your-app-hash>" }]
+    "data": [{ "scheme": "https", "host": "<your-org>.godetour.link", "pathPrefix": "/<your-app-hash>" }]
   }]
 }
 ```
 
-> **Universal Links not opening the app?** Add `?mode=developer` to the `associatedDomains` entry: `"applinks:<your-org>.posted.link?mode=developer"`. This bypasses Apple's CDN and fetches the AASA file directly from your domain on every launch instead of relying on a potentially stale cached version. Requires **Settings → Developer → Associated Domains Development** to be enabled on the device and a development-signed build. Remove it before submitting to TestFlight or the App Store.
+> **Universal Links not opening the app?** Add `?mode=developer` to the `associatedDomains` entry: `"applinks:<your-org>.godetour.link?mode=developer"`. This bypasses Apple's CDN and fetches the AASA file directly from your domain on every launch instead of relying on a potentially stale cached version. Requires **Settings → Developer → Associated Domains Development** to be enabled on the device and a development-signed build. Remove it before submitting to TestFlight or the App Store.
 
 These same values go into the simulator commands in the next section.
 
@@ -126,10 +126,10 @@ Open a Posted link directly from the terminal:
 
 ```sh
 # iOS simulator
-xcrun simctl openurl booted "https://<your-org>.posted.link/<your-app-hash>/details"
+xcrun simctl openurl booted "https://<your-org>.godetour.link/<your-app-hash>/details"
 
 # Android emulator
-adb shell am start -a android.intent.action.VIEW -d "https://<your-org>.posted.link/<your-app-hash>/details"
+adb shell am start -a android.intent.action.VIEW -d "https://<your-org>.godetour.link/<your-app-hash>/details"
 ```
 
 Alternatively, paste the link into Notes or Messages on the device and tap it — this uses the same OS routing path a real user would.

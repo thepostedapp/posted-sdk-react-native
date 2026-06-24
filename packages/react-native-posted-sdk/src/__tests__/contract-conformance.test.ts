@@ -54,6 +54,7 @@ import { sendUniversalLinkClick } from "../links/api/sendUniversalLinkClick";
 import { sendEvent } from "../analytics/api/events";
 import { sendRetentionEvent } from "../analytics/api/retention";
 import { SDK_HEADER_VALUE } from "../version";
+import { PostedEventNames } from "../analytics/types";
 
 // ---- Contract + AJV setup ----
 
@@ -166,7 +167,7 @@ describe("RN SDK → backend contract conformance", () => {
       await getDeferredLink({ apiKey: API_KEY, appID: APP_ID, shouldUseClipboard: false });
 
       expect(calls).toHaveLength(1);
-      const { url, method, headers, body } = calls[0];
+      const { url, method, headers, body } = calls[0]!;
 
       expect(url).toBe("https://godetour.dev/api/link/match-link");
       expect(method).toBe("POST");
@@ -191,7 +192,7 @@ describe("RN SDK → backend contract conformance", () => {
       await getDeferredLink({ apiKey: API_KEY, appID: APP_ID, shouldUseClipboard: false });
 
       expect(calls).toHaveLength(1);
-      const { url, method, headers, body } = calls[0];
+      const { url, method, headers, body } = calls[0]!;
 
       expect(url).toBe("https://godetour.dev/api/link/match-link");
       expect(method).toBe("POST");
@@ -226,7 +227,7 @@ describe("RN SDK → backend contract conformance", () => {
       await resolveShortLink({ apiKey: API_KEY, appID: APP_ID, url: shortUrl });
 
       expect(calls).toHaveLength(1);
-      const { url, method, headers, body } = calls[0];
+      const { url, method, headers, body } = calls[0]!;
 
       expect(url).toBe("https://godetour.dev/api/link/resolve-short");
       expect(method).toBe("POST");
@@ -248,7 +249,7 @@ describe("RN SDK → backend contract conformance", () => {
       await sendUniversalLinkClick({ apiKey: API_KEY, appID: APP_ID, url: clickUrl });
 
       expect(calls).toHaveLength(1);
-      const { url, method, headers, body } = calls[0];
+      const { url, method, headers, body } = calls[0]!;
 
       expect(url).toBe("https://godetour.dev/api/link/universal-link-click");
       expect(method).toBe("POST");
@@ -281,7 +282,7 @@ describe("RN SDK → backend contract conformance", () => {
       await sendUniversalLinkClick({ apiKey: API_KEY, appID: APP_ID, url: clickUrl });
 
       expect(calls).toHaveLength(1);
-      const { body } = calls[0];
+      const { body } = calls[0]!;
       const b = body as Record<string, unknown>;
 
       // params must be present and contain the URL query parameters
@@ -303,13 +304,13 @@ describe("RN SDK → backend contract conformance", () => {
         appID: APP_ID,
         deviceId: DEVICE_ID,
         event: {
-          eventName: "purchase",
+          eventName: PostedEventNames.Purchase,
           data: { order_id: "ord_1001", value: 29.99 },
         },
       });
 
       expect(calls).toHaveLength(1);
-      const { url, method, headers, body } = calls[0];
+      const { url, method, headers, body } = calls[0]!;
 
       expect(url).toBe("https://godetour.dev/api/analytics/event");
       expect(method).toBe("POST");
@@ -336,14 +337,14 @@ describe("RN SDK → backend contract conformance", () => {
         apiKey: API_KEY,
         appID: APP_ID,
         deviceId: DEVICE_ID,
-        event: { eventName: "level_completed", data: undefined },
+        event: { eventName: PostedEventNames.Login, data: undefined },
       });
 
       expect(calls).toHaveLength(1);
-      const { body } = calls[0];
+      const { body } = calls[0]!;
       const b = body as Record<string, unknown>;
 
-      expect(b.event_name).toBe("level_completed");
+      expect(b.event_name).toBe(PostedEventNames.Login);
       // data absent when undefined (JSON.stringify drops undefined values)
       expect(Object.prototype.hasOwnProperty.call(b, "data")).toBe(false);
 
@@ -366,7 +367,7 @@ describe("RN SDK → backend contract conformance", () => {
       });
 
       expect(calls).toHaveLength(1);
-      const { url, method, headers, body } = calls[0];
+      const { url, method, headers, body } = calls[0]!;
 
       expect(url).toBe("https://godetour.dev/api/analytics/retention");
       expect(method).toBe("POST");

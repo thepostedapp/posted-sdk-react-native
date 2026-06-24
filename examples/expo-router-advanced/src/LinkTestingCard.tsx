@@ -21,7 +21,7 @@ export function LinkTestingCard({ title }: LinkTestingCardProps) {
       <View style={styles.divider} />
 
       <Text style={styles.sectionHeader}>Posted link</Text>
-      <Text style={styles.code}>https://&lt;org&gt;.posted.link/&lt;hash&gt;/(app)/details</Text>
+      <Text style={styles.code}>https://&lt;org&gt;.godetour.link/&lt;hash&gt;/(app)/details</Text>
 
       <Text style={styles.sectionHeader}>Deferred Link</Text>
       <Text style={styles.bullet}>

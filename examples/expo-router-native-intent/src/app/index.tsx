@@ -33,16 +33,16 @@ export default function HomeScreen() {
             Uninstall the app or clear its data, open a Posted link in the mobile browser, then
             install and launch — the SDK resolves the link automatically.
           </Text>
-          <Text style={styles.code}>https://&lt;your-org&gt;.posted.link/&lt;hash&gt;/details</Text>
+          <Text style={styles.code}>https://&lt;your-org&gt;.godetour.link/&lt;hash&gt;/details</Text>
 
           <Text style={styles.sectionHeader}>Universal / App Link</Text>
           <Text style={styles.bullet}>
-            Open a <Text style={styles.accent}>posted.link</Text> URL in the browser or paste into
+            Open a <Text style={styles.accent}>godetour.link</Text> URL in the browser or paste into
             Notes/Messages and tap — Posted resolves it in{" "}
             <Text style={styles.accent}>+native-intent</Text> and routes directly to the target
             screen.
           </Text>
-          <Text style={styles.code}>https://&lt;your-org&gt;.posted.link/&lt;hash&gt;/details</Text>
+          <Text style={styles.code}>https://&lt;your-org&gt;.godetour.link/&lt;hash&gt;/details</Text>
 
           <View style={styles.divider} />
 

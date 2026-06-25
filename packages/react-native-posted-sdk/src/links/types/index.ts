@@ -53,3 +53,10 @@ export type PostedUrlEvent = {
 export type PostedUrlSubscription = {
   remove: () => void;
 };
+
+/**
+ * Attribution result returned by resolveAppLaunch.
+ * The string is the resolved link URL (deep link for deferred, launch URL for link-present).
+ * null means no attribution link was found for this install/launch.
+ */
+export type PostedResult = string | null;

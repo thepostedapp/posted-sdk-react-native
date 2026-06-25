@@ -259,7 +259,70 @@ describe("resolveAppLaunch", () => {
   });
 
   // -----------------------------------------------------------------------
-  // 4. Re-arm via resetSession()
+  // 4. Concurrent calls — single-flight guard
+  // -----------------------------------------------------------------------
+  describe("single-flight guard (concurrent calls)", () => {
+    it("two overlapping calls share a single network resolution", async () => {
+      mockLinking.getInitialURL.mockResolvedValue(null);
+      const storage = makeStorage();
+
+      let resolveFetch!: (value: object) => void;
+      const pendingFetch = new Promise<object>((resolve) => {
+        resolveFetch = resolve;
+      });
+      let fetchCallCount = 0;
+      global.fetch = jest.fn().mockImplementation(() => {
+        fetchCallCount++;
+        return pendingFetch.then((body) => ({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve(body),
+        }));
+      }) as jest.Mock;
+
+      // Fire both calls before the network responds
+      const call1 = resolveAppLaunch(makeConfig(storage));
+      const call2 = resolveAppLaunch(makeConfig(storage));
+
+      // Unblock the single network call
+      resolveFetch({ link: "https://example.com/concurrent" });
+
+      const [result1, result2] = await Promise.all([call1, call2]);
+
+      expect(result1).toBe("https://example.com/concurrent");
+      expect(result2).toBe("https://example.com/concurrent");
+      // Only ONE network call must have been made
+      expect(fetchCallCount).toBe(1);
+    });
+  });
+
+  // -----------------------------------------------------------------------
+  // 5. Error path — transient failures must not arm fire-once
+  // -----------------------------------------------------------------------
+  describe("error path does not arm fire-once", () => {
+    it("a thrown branch error does not persist fire-once — next launch retries", async () => {
+      mockLinking.getInitialURL.mockResolvedValue(null);
+      const storage = makeStorage();
+
+      // First call: network throws
+      global.fetch = jest.fn().mockRejectedValue(new Error("network error")) as jest.Mock;
+      const first = await resolveAppLaunch(makeConfig(storage));
+
+      expect(first).toBeNull();
+      // Fire-once flag must NOT be armed after a transient error
+      expect(await storage.getItem("Posted_attributionResolved")).toBeNull();
+
+      // Second call: network recovers → must retry (not short-circuit to null)
+      const secondCalls = mockFetch({ link: "https://example.com/retry" });
+      const second = await resolveAppLaunch(makeConfig(storage));
+
+      expect(second).toBe("https://example.com/retry");
+      expect(secondCalls).toHaveLength(1);
+    });
+  });
+
+  // -----------------------------------------------------------------------
+  // 6. Re-arm via resetSession()
   // -----------------------------------------------------------------------
   describe("resetSession re-arms fire-once", () => {
     it("after resetSession, next resolveAppLaunch makes a fresh network call", async () => {

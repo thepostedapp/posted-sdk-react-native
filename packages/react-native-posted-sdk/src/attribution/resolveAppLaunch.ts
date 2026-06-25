@@ -15,6 +15,10 @@ const NULL_SENTINEL = "\x00";
 // In-memory cache: survives within a single JS runtime; cleared by resetSession().
 let memoryCache: { resolved: true; result: PostedResult } | null = null;
 
+// Single-flight guard: concurrent callers share the same resolution promise
+// rather than each firing an independent network call.
+let inFlight: Promise<PostedResult> | null = null;
+
 function resolveConfig(config?: Config): RequiredConfig {
   if (config) {
     return {
@@ -72,10 +76,53 @@ async function resolveLinkPresent(cfg: RequiredConfig, url: string): Promise<Pos
     }
 
     // Register the universal link click for attribution (fire-and-forget; result not used here).
+    // NOTE: The link-present path legitimately makes two HTTP calls (resolve-short + universal-link-click);
+    // this is the legacy flow preserved as-is, not a violation of the "one attribution call per launch" invariant.
     await sendUniversalLinkClick({ apiKey: cfg.apiKey, appID: cfg.appID, url });
   }
 
   return resolvedUrl;
+}
+
+async function doResolve(config?: Config): Promise<PostedResult> {
+  const cfg = resolveConfig(config);
+
+  // Persistent cache (survives app restarts and updates on the same install)
+  const cached = await readCache(cfg.storage);
+  if (cached.hit) {
+    memoryCache = { resolved: true, result: cached.result };
+    return cached.result;
+  }
+
+  let result: PostedResult;
+  try {
+    // Link-present branch: app opened via a universal/custom-scheme link
+    const initialUrl = await Linking.getInitialURL();
+    if (initialUrl && !isInfrastructureUrl(initialUrl)) {
+      result = await resolveLinkPresent(cfg, initialUrl);
+    } else {
+      // Deferred branch: probabilistic or deterministic fingerprint match
+      result = await getDeferredLink({
+        apiKey: cfg.apiKey,
+        appID: cfg.appID,
+        shouldUseClipboard: cfg.shouldUseClipboard,
+      });
+    }
+  } catch (error) {
+    // Transient failure: do NOT arm fire-once — next launch will retry.
+    console.error("🔗[Posted:ATTRIBUTION_ERROR]", error);
+    return null;
+  }
+
+  // Persist fire-once flag + result
+  try {
+    await writeCache(cfg.storage, result);
+  } catch {
+    // Storage failure is non-fatal; result is still returned.
+  }
+
+  memoryCache = { resolved: true, result };
+  return result;
 }
 
 /**
@@ -101,44 +148,17 @@ export const resolveAppLaunch = async (
     return memoryCache.result;
   }
 
-  const cfg = resolveConfig(config);
-
-  // 2. Persistent cache (survives app restarts and updates on the same install)
-  const cached = await readCache(cfg.storage);
-  if (cached.hit) {
-    memoryCache = { resolved: true, result: cached.result };
-    return cached.result;
+  // 2. Single-flight guard: join an in-progress resolution rather than firing a second network call.
+  if (inFlight) {
+    return inFlight;
   }
 
-  let result: PostedResult = null;
-
+  inFlight = doResolve(config);
   try {
-    // 3. Link-present branch: app opened via a universal/custom-scheme link
-    const initialUrl = await Linking.getInitialURL();
-    if (initialUrl && !isInfrastructureUrl(initialUrl)) {
-      result = await resolveLinkPresent(cfg, initialUrl);
-    } else {
-      // 4. Deferred branch: probabilistic or deterministic fingerprint match
-      result = await getDeferredLink({
-        apiKey: cfg.apiKey,
-        appID: cfg.appID,
-        shouldUseClipboard: cfg.shouldUseClipboard,
-      });
-    }
-  } catch (error) {
-    console.error("🔗[Posted:ATTRIBUTION_ERROR]", error);
-    result = null;
+    return await inFlight;
+  } finally {
+    inFlight = null;
   }
-
-  // 5. Persist fire-once flag + result
-  try {
-    await writeCache(cfg.storage, result);
-  } catch {
-    // Storage failure is non-fatal; result is still returned.
-  }
-
-  memoryCache = { resolved: true, result };
-  return result;
 };
 
 /**
@@ -150,8 +170,9 @@ export const resolveAppLaunch = async (
 export const resetSession = async (config?: Config): Promise<void> => {
   const cfg = config ? resolveConfig(config) : getGlobalConfig();
 
-  // Clear in-memory cache unconditionally.
+  // Clear both caches unconditionally.
   memoryCache = null;
+  inFlight = null;
 
   if (!cfg) return;
 

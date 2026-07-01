@@ -1,10 +1,14 @@
 export { PostedProvider, usePostedContext } from "./PostedContext";
 export { POSTED_LINKING_PREFIX, Posted } from "./reactNavigation";
 
+export { configure } from "./attribution/configure";
+export { resolveAppLaunch, resetSession } from "./attribution/resolveAppLaunch";
+
 export type {
   Config,
   PostedContextType,
   PostedLink,
+  PostedResult,
   PostedUrlEvent,
   PostedUrlSubscription,
   PostedStorage,

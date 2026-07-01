@@ -4,6 +4,14 @@ export { POSTED_LINKING_PREFIX, Posted } from "./reactNavigation";
 export { configure } from "./attribution/configure";
 export { resolveAppLaunch, resetSession } from "./attribution/resolveAppLaunch";
 
+// @deprecated Use resolveAppLaunch() instead. Will be removed in a future major version.
+export {
+  resolveInitialLink,
+  processLink,
+  getDeferredLink,
+  resolveShortLink,
+} from "./attribution/deprecatedShims";
+
 export type {
   Config,
   PostedContextType,

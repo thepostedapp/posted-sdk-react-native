@@ -356,4 +356,80 @@ describe("resolveAppLaunch", () => {
       expect(await storage.getItem("Posted_attributionResult")).toBeNull();
     });
   });
+
+  // -----------------------------------------------------------------------
+  // 7. Cached-result JSON envelope (POS-152)
+  // -----------------------------------------------------------------------
+  describe("cached-result JSON envelope", () => {
+    const RESULT_KEY = "Posted_attributionResult";
+    const FLAG_KEY = "Posted_attributionResolved";
+    const NULL_SENTINEL = "\x00";
+
+    it("persists a non-null result as a JSON envelope and round-trips it", async () => {
+      mockLinking.getInitialURL.mockResolvedValue(null);
+      const storage = makeStorage();
+      mockFetch({ link: "https://example.com/envelope" });
+
+      const first = await resolveAppLaunch(makeConfig(storage));
+      expect(first).toBe("https://example.com/envelope");
+      // Stored form is a self-describing JSON envelope, not a bare string.
+      expect(await storage.getItem(RESULT_KEY)).toBe(
+        JSON.stringify({ result: "https://example.com/envelope" }),
+      );
+
+      // Round-trip: fresh runtime (memory cleared, storage kept) reads it back with no network.
+      await resetSession();
+      const rereadCalls = mockFetch({});
+      const second = await resolveAppLaunch(makeConfig(storage));
+
+      expect(second).toBe("https://example.com/envelope");
+      expect(rereadCalls).toHaveLength(0);
+    });
+
+    it('persists a null result as {"result":null} and round-trips it', async () => {
+      mockLinking.getInitialURL.mockResolvedValue(null);
+      const storage = makeStorage();
+      mockFetch({ link: null });
+
+      const first = await resolveAppLaunch(makeConfig(storage));
+      expect(first).toBeNull();
+      expect(await storage.getItem(RESULT_KEY)).toBe(JSON.stringify({ result: null }));
+
+      // Round-trip: fresh runtime reads the null envelope back with no network.
+      await resetSession();
+      const rereadCalls = mockFetch({});
+      const second = await resolveAppLaunch(makeConfig(storage));
+
+      expect(second).toBeNull();
+      expect(rereadCalls).toHaveLength(0);
+    });
+
+    it("migration: reads a legacy NULL_SENTINEL result as null with no network", async () => {
+      mockLinking.getInitialURL.mockResolvedValue(null);
+      const storage = makeStorage();
+      // Simulate an install upgraded from a pre-envelope version.
+      await storage.setItem(FLAG_KEY, "true");
+      await storage.setItem(RESULT_KEY, NULL_SENTINEL);
+
+      const calls = mockFetch({});
+      const result = await resolveAppLaunch(makeConfig(storage));
+
+      expect(result).toBeNull();
+      expect(calls).toHaveLength(0);
+    });
+
+    it("migration: reads a legacy bare-string result with no network", async () => {
+      mockLinking.getInitialURL.mockResolvedValue(null);
+      const storage = makeStorage();
+      // Legacy installs stored the raw URL string directly (no envelope).
+      await storage.setItem(FLAG_KEY, "true");
+      await storage.setItem(RESULT_KEY, "https://example.com/legacy");
+
+      const calls = mockFetch({});
+      const result = await resolveAppLaunch(makeConfig(storage));
+
+      expect(result).toBe("https://example.com/legacy");
+      expect(calls).toHaveLength(0);
+    });
+  });
 });

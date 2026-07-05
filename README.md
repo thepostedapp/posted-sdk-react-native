@@ -464,6 +464,16 @@ The package has been renamed. Update your imports:
 
 The old names are exported as deprecated re-exports in `2.0.0` for one minor cycle to ease migration.
 
+### 3.0.0 — link methods → `resolveAppLaunch`
+
+3.0.0 consolidates the imperative link-resolution methods into a single attribution-first
+call. `resolveInitialLink` / `processLink` / `getDeferredLink` / `resolveShortLink` are
+now `@deprecated` aliases that forward to `resolveAppLaunch(config)`. The `url?` argument
+on `processLink` / `resolveShortLink` is **ignored** — the facade detects the launch URL
+internally via `Linking.getInitialURL()` and there is no explicit-URL override on React
+Native. See [`MIGRATION.md`](./packages/react-native-posted-sdk/MIGRATION.md) §7–§9 for
+the full mapping, behavior change, and removal timeline.
+
 ## Other posted-sdk SDKs
 
 posted-sdk is also available for other app stacks:

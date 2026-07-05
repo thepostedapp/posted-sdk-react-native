@@ -134,3 +134,97 @@ DetourUrlSubscription           →  PostedUrlSubscription
 DetourStorage                   →  PostedStorage
 detour://                       →  posted://
 ```
+
+---
+
+# 3.0.0 — Attribution API: old link methods → `resolveAppLaunch`
+
+3.0.0 consolidates the four imperative link-resolution methods into a single
+attribution-first entry point, `resolveAppLaunch(config)`. The old methods are
+still exported as `@deprecated` aliases for one minor cycle so existing code keeps
+compiling, but each now forwards to `resolveAppLaunch()` and logs a runtime
+deprecation warning.
+
+## 7. Method mapping
+
+Replace every call to an old link method with a single `resolveAppLaunch(config)`
+call at app launch:
+
+| Old method (3.0.0 `@deprecated`) | New | Notes |
+|---|---|---|
+| `resolveInitialLink(config)` | `resolveAppLaunch(config)` | Direct 1:1 replacement. |
+| `processLink(config, url?)` | `resolveAppLaunch(config)` | `url` argument is **ignored** — see §8. |
+| `getDeferredLink(config)` | `resolveAppLaunch(config)` | The deferred branch is now selected automatically; no need to call it directly. |
+| `resolveShortLink(config, url?)` | `resolveAppLaunch(config)` | `url` argument is **ignored** — see §8. Short-link resolution now happens internally inside the link-present branch. |
+
+```diff
+-import { processLink, getDeferredLink } from '@posted-sdk/react-native';
++import { resolveAppLaunch } from '@posted-sdk/react-native';
+
+-const result = await processLink(config, launchUrl);
++const result = await resolveAppLaunch(config);
+```
+
+`resolveAppLaunch()` returns a `PostedResult` (`string | null`) — the resolved link
+URL, or `null` when no attribution was found for this launch.
+
+### One call per launch (fire-once)
+
+Unlike the old methods, `resolveAppLaunch()` is **fire-once per install**: the first
+call performs one network resolution and caches the result; subsequent calls (same
+process, or across app restarts and updates on the same install) return the cached
+value with zero network calls. You no longer need to guard against calling it twice.
+Call it once during startup.
+
+To deliberately re-arm resolution (e.g. logout/reinstall flows, QA), call
+`resetSession(config)`; the next `resolveAppLaunch()` performs a fresh resolution.
+
+## 8. Behavior change: the `url?` argument is now ignored
+
+`processLink(config, url?)` and `resolveShortLink(config, url?)` previously accepted
+an explicit launch URL. **In 3.0.0 that argument is ignored.** The `resolveAppLaunch()`
+facade detects the launch URL internally via React Native's
+[`Linking.getInitialURL()`](https://reactnative.dev/docs/linking#getinitialurl) and
+then dispatches to the correct branch automatically:
+
+- **Link-present branch** — if `Linking.getInitialURL()` returns a (non-infrastructure)
+  URL, the facade resolves it, transparently expanding a short link and registering the
+  universal-link click.
+- **Deferred branch** — otherwise the facade runs deferred/fingerprint matching (the old
+  `getDeferredLink` path).
+
+### Was there a supported explicit-URL override?
+
+**No — on React Native there is no public explicit-URL parameter.** `resolveAppLaunch`
+takes only `config`; its second positional parameter (`launchContext`) is reserved for
+cross-platform API parity and is **always omitted on React Native** — the native
+`Linking` module is the single source of truth for the launch URL. This is intentional:
+it guarantees the "one attribution resolution per launch" invariant and prevents callers
+from attributing an arbitrary URL.
+
+**If your code passed an explicit `url`:**
+
+- **You were forwarding the app's own launch URL** (the common case — e.g. a value you
+  had already read from `Linking.getInitialURL()`): just drop the argument. The facade
+  reads the same value itself. `resolveAppLaunch(config)` is a complete replacement.
+- **You were passing a URL received while the app was already running** (a runtime deep
+  link, not the cold-launch URL): that was never `resolveAppLaunch`'s job and is not an
+  attribution call. Continue handling runtime links through `PostedProvider` /
+  `usePostedContext` (or the Expo Router native-intent handler) as documented in the
+  README — those paths are unchanged in 3.0.0.
+
+## 9. Removal timeline (3.0.0)
+
+The `resolveInitialLink` / `processLink` / `getDeferredLink` / `resolveShortLink`
+aliases are deprecated in 3.0.0 and will be **removed in the next major version**.
+Migrate to `resolveAppLaunch()` before upgrading past 3.0.x. After removal, imports of
+the old names will fail to compile — use the mapping in §7 to update them.
+
+### Quick-find patterns (project-wide search and replace)
+
+```
+resolveInitialLink(config)        →  resolveAppLaunch(config)
+getDeferredLink(config)           →  resolveAppLaunch(config)
+processLink(config, url)          →  resolveAppLaunch(config)   // drop url
+resolveShortLink(config, url)     →  resolveAppLaunch(config)   // drop url
+```

@@ -2,6 +2,38 @@
 
 All notable changes to `@posted-sdk/react-native` are documented here.
 
+## [3.0.0] — Attribution-first API: `resolveAppLaunch`
+
+3.0.0 replaces the four imperative link-resolution methods with a single
+attribution-first entry point, `resolveAppLaunch(config)`. For the full upgrade path
+see [MIGRATION.md](./MIGRATION.md) §7–§9.
+
+### New public surface
+
+- **`resolveAppLaunch(config?)`** — resolves attribution for the current app launch and
+  returns `PostedResult` (`string | null`). Detects the launch URL internally via
+  `Linking.getInitialURL()` and dispatches to the link-present or deferred branch
+  automatically. **Fire-once per install**: caches the result across restarts/updates;
+  subsequent calls make no network request.
+- **`resetSession(config?)`** — re-arms fire-once resolution (logout/reinstall/QA).
+
+### Deprecated (removed next major)
+
+- `resolveInitialLink`, `processLink`, `getDeferredLink`, `resolveShortLink` are now
+  `@deprecated` aliases that forward to `resolveAppLaunch(config)` and emit a runtime
+  `console.warn`. Migrate to `resolveAppLaunch()` before upgrading past 3.0.x.
+
+### Behavior changes
+
+- **The `url?` argument on `processLink`/`resolveShortLink` is now ignored.** The facade
+  detects the launch URL internally via `Linking.getInitialURL()`. On React Native there
+  is **no public explicit-URL override** — `resolveAppLaunch` takes only `config` (its
+  `launchContext` parameter is reserved for cross-platform parity and always omitted on
+  RN). Callers that forwarded the app's own launch URL should simply drop the argument;
+  runtime deep links (received while the app is running) continue to flow through
+  `PostedProvider` / `usePostedContext` / the Expo Router native-intent handler. See
+  [MIGRATION.md](./MIGRATION.md) §8.
+
 ## [2.0.0] — Breaking rename: `@swmansion/react-native-detour` → `@posted-sdk/react-native`
 
 This release renames the package and all public symbols from the `Detour*` prefix to `Posted*`.

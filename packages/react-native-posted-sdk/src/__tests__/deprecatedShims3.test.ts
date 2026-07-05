@@ -1,3 +1,10 @@
+// ---- Imports ----
+import { clearGlobalConfig } from "../attribution/configure";
+import { resetDeprecationWarnings } from "../attribution/deprecatedShims";
+import { resetSession } from "../attribution/resolveAppLaunch";
+import * as SDK from "../index";
+import type { PostedStorage } from "../links/types";
+
 /**
  * Deprecated 3.0.0 public-surface shims — POS-130
  *
@@ -52,13 +59,6 @@ jest.mock("react-native", () => ({
   PixelRatio: { get: jest.fn().mockReturnValue(3) },
 }));
 
-// ---- Imports ----
-
-import * as SDK from "../index";
-import { clearGlobalConfig } from "../attribution/configure";
-import { resetSession } from "../attribution/resolveAppLaunch";
-import type { PostedStorage } from "../links/types";
-
 // ---- Helpers ----
 
 const API_KEY = "test-api-key";
@@ -68,8 +68,12 @@ function makeStorage(): PostedStorage {
   const _store: Record<string, string> = {};
   return {
     getItem: jest.fn(async (k: string) => _store[k] ?? null),
-    setItem: jest.fn(async (k: string, v: string) => { _store[k] = v; }),
-    removeItem: jest.fn(async (k: string) => { delete _store[k]; }),
+    setItem: jest.fn(async (k: string, v: string) => {
+      _store[k] = v;
+    }),
+    removeItem: jest.fn(async (k: string) => {
+      delete _store[k];
+    }),
   };
 }
 
@@ -92,6 +96,7 @@ describe("Deprecated 3.0.0 shims", () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     clearGlobalConfig();
+    resetDeprecationWarnings();
     await resetSession();
   });
 
@@ -154,6 +159,68 @@ describe("Deprecated 3.0.0 shims", () => {
   });
 
   // -----------------------------------------------------------------------
+  // Once-per-session de-duplication (POS-177)
+  // -----------------------------------------------------------------------
+  describe("deprecation warnings are de-duplicated per session", () => {
+    let warnSpy: jest.SpyInstance;
+
+    beforeEach(() => {
+      warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+      mockFetch({ link: null });
+    });
+
+    afterEach(() => {
+      warnSpy.mockRestore();
+    });
+
+    it("warns only once across repeated calls to the same shim", async () => {
+      await SDK.resolveInitialLink(makeConfig(makeStorage()));
+      await SDK.resolveInitialLink(makeConfig(makeStorage()));
+      await SDK.resolveInitialLink(makeConfig(makeStorage()));
+
+      const initialLinkWarnings = warnSpy.mock.calls.filter(
+        ([msg]) => typeof msg === "string" && msg.includes("resolveInitialLink"),
+      );
+      expect(initialLinkWarnings).toHaveLength(1);
+    });
+
+    it("each shim keeps its own independent once-per-session guard", async () => {
+      // Two calls each — expect exactly one warning per distinct method.
+      await SDK.resolveInitialLink(makeConfig(makeStorage()));
+      await SDK.resolveInitialLink(makeConfig(makeStorage()));
+      await SDK.processLink(makeConfig(makeStorage()));
+      await SDK.processLink(makeConfig(makeStorage()));
+      await SDK.getDeferredLink(makeConfig(makeStorage()));
+      await SDK.getDeferredLink(makeConfig(makeStorage()));
+      await SDK.resolveShortLink(makeConfig(makeStorage()));
+      await SDK.resolveShortLink(makeConfig(makeStorage()));
+
+      for (const method of [
+        "resolveInitialLink",
+        "processLink",
+        "getDeferredLink",
+        "resolveShortLink",
+      ]) {
+        const perMethod = warnSpy.mock.calls.filter(
+          ([msg]) => typeof msg === "string" && msg.includes(`${method}()`),
+        );
+        expect(perMethod).toHaveLength(1);
+      }
+    });
+
+    it("resetDeprecationWarnings re-arms the warning for a fresh session", async () => {
+      await SDK.resolveInitialLink(makeConfig(makeStorage()));
+      resetDeprecationWarnings();
+      await SDK.resolveInitialLink(makeConfig(makeStorage()));
+
+      const initialLinkWarnings = warnSpy.mock.calls.filter(
+        ([msg]) => typeof msg === "string" && msg.includes("resolveInitialLink"),
+      );
+      expect(initialLinkWarnings).toHaveLength(2);
+    });
+  });
+
+  // -----------------------------------------------------------------------
   // Delegation to resolveAppLaunch (deferred branch with no launch URL)
   // -----------------------------------------------------------------------
   describe("delegates to resolveAppLaunch", () => {
@@ -178,7 +245,10 @@ describe("Deprecated 3.0.0 shims", () => {
 
     it("processLink delegates to resolveAppLaunch (url arg is ignored)", async () => {
       mockFetch({ link: "https://example.com/link" });
-      const result = await SDK.processLink(makeConfig(makeStorage()), "https://ignored.example.com/x");
+      const result = await SDK.processLink(
+        makeConfig(makeStorage()),
+        "https://ignored.example.com/x",
+      );
       expect(result).toBe("https://example.com/link");
       // Should call match-link (deferred branch, no Linking URL)
       expect((global.fetch as jest.Mock).mock.calls[0]![0]).toBe(
@@ -194,7 +264,10 @@ describe("Deprecated 3.0.0 shims", () => {
 
     it("resolveShortLink delegates to resolveAppLaunch (url arg is ignored)", async () => {
       mockFetch({ link: "https://example.com/full" });
-      const result = await SDK.resolveShortLink(makeConfig(makeStorage()), "https://ignored.example.com/short");
+      const result = await SDK.resolveShortLink(
+        makeConfig(makeStorage()),
+        "https://ignored.example.com/short",
+      );
       expect(result).toBe("https://example.com/full");
     });
   });

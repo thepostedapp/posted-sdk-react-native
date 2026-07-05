@@ -526,4 +526,103 @@ describe("resolveAppLaunch", () => {
       expect(storage._store[FLAG_KEY]).toBeUndefined();
     });
   });
+
+  // -----------------------------------------------------------------------
+  // 9. resetSession vs in-flight resolution race (POS-154)
+  // -----------------------------------------------------------------------
+  describe("resetSession vs in-flight resolution (POS-154)", () => {
+    it("a resolution started before resetSession does not persist or re-populate the cache", async () => {
+      mockLinking.getInitialURL.mockResolvedValue(null);
+      const storage = makeStorage();
+
+      // A deferred network call whose completion we control.
+      let resolveFetch!: (value: object) => void;
+      const pendingFetch = new Promise<object>((resolve) => {
+        resolveFetch = resolve;
+      });
+      global.fetch = jest.fn().mockImplementation(() =>
+        pendingFetch.then((body) => ({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve(body),
+        })),
+      ) as jest.Mock;
+
+      // Start a resolution; it parks on the network call.
+      const inflight = resolveAppLaunch(makeConfig(storage));
+
+      // Reset while that resolution is still in flight.
+      await resetSession(makeConfig(storage));
+
+      // Now let the original network call complete.
+      resolveFetch({ link: "https://example.com/stale" });
+      const result = await inflight;
+
+      // The original caller still receives its resolved value...
+      expect(result).toBe("https://example.com/stale");
+
+      // ...but the reset must have won: fire-once flag NOT armed, result not cached.
+      expect(await storage.getItem("Posted_attributionResolved")).toBeNull();
+      expect(await storage.getItem("Posted_attributionResult")).toBeNull();
+
+      // And the in-memory cache is clean: a subsequent call performs a FRESH
+      // network resolution rather than short-circuiting on the stale result.
+      const freshCalls = mockFetch({ link: "https://example.com/fresh" });
+      const next = await resolveAppLaunch(makeConfig(storage));
+
+      expect(next).toBe("https://example.com/fresh");
+      expect(freshCalls).toHaveLength(1);
+    });
+
+    it("a fresh resolution started after resetSession is not clobbered by the stale one settling", async () => {
+      mockLinking.getInitialURL.mockResolvedValue(null);
+      const storage = makeStorage();
+
+      // First (stale) and second (fresh) network calls — completion controlled.
+      let resolveStale!: (value: object) => void;
+      const stalePending = new Promise<object>((resolve) => {
+        resolveStale = resolve;
+      });
+      let resolveFresh!: (value: object) => void;
+      const freshPending = new Promise<object>((resolve) => {
+        resolveFresh = resolve;
+      });
+
+      let fetchCallCount = 0;
+      global.fetch = jest.fn().mockImplementation(() => {
+        fetchCallCount++;
+        const pending = fetchCallCount === 1 ? stalePending : freshPending;
+        return pending.then((body) => ({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve(body),
+        }));
+      }) as jest.Mock;
+
+      // Stale resolution starts and parks.
+      const stale = resolveAppLaunch(makeConfig(storage));
+
+      // Reset, then start a fresh resolution while the stale one is still pending.
+      await resetSession(makeConfig(storage));
+      const fresh = resolveAppLaunch(makeConfig(storage));
+
+      // Settle the stale call first — its finally must NOT clear the fresh in-flight.
+      resolveStale({ link: "https://example.com/stale" });
+      await stale;
+
+      // Settle the fresh call.
+      resolveFresh({ link: "https://example.com/fresh" });
+      expect(await fresh).toBe("https://example.com/fresh");
+
+      // Exactly two network calls: one stale, one fresh — no third double-fire.
+      expect(fetchCallCount).toBe(2);
+
+      // Only the fresh result is cached/armed. Stored form is the versioned
+      // JSON envelope introduced by POS-152/POS-162, not a bare string.
+      expect(await storage.getItem("Posted_attributionResolved")).toBe("true");
+      expect(await storage.getItem("Posted_attributionResult")).toBe(
+        JSON.stringify({ version: 1, result: "https://example.com/fresh" }),
+      );
+    });
+  });
 });

@@ -14,27 +14,53 @@ import { getGlobalConfig } from "./configure";
 // install's fire-once flag survives an app update. See POS-152.
 const NULL_SENTINEL = "\x00";
 
-// Persisted result is a self-describing JSON envelope: {"result": <string|null>}.
-// This avoids any theoretical collision with a real attributed value and leaves
-// room for future fields without changing the storage contract.
-type CacheEnvelope = { result: PostedResult };
+// Schema version stamped on every cached-result blob we write. Bump this when
+// the envelope shape changes incompatibly; decode drops any blob whose version
+// it does not recognise (see decodeCachedResult) so a future shape change
+// re-resolves cleanly instead of returning data we can't trust. See POS-162.
+const CACHE_SCHEMA_VERSION = 1;
+
+// Persisted result is a self-describing, versioned JSON envelope:
+//   {"version": <number>, "result": <string|null>}.
+// The envelope avoids any theoretical collision with a real attributed value
+// and the version field lets future readers detect and drop incompatible blobs.
+type CacheEnvelope = { version: number; result: PostedResult };
+
+// Outcome of decoding a persisted cached-result value. `ok: false` means the
+// blob is missing, corrupt, or stamped with an unrecognised schema version —
+// the caller must treat it as a cache miss and re-resolve rather than trust it.
+type DecodeOutcome = { ok: true; result: PostedResult } | { ok: false };
 
 // Decode a persisted cached-result value across formats:
-//   - JSON envelope ({"result": ...}) — current format
-//   - NULL_SENTINEL / null — legacy null marker
+//   - versioned JSON envelope ({"version": N, "result": ...}) — current format
+//   - unversioned JSON envelope ({"result": ...}) — POS-152 transitional format
+//   - NULL_SENTINEL — legacy null marker
 //   - bare string — legacy result written before the envelope existed
-function decodeCachedResult(raw: string | null): PostedResult {
-  if (raw === null || raw === NULL_SENTINEL) return null;
+//   - null (absent blob) — flag set without a persisted result → drop
+// Returns { ok: false } for anything we cannot safely trust (absent blob or a
+// version we don't recognise) so the caller re-resolves instead of short-
+// circuiting on stale/undecodable data.
+function decodeCachedResult(raw: string | null): DecodeOutcome {
+  // Flag set but no blob persisted (the iOS flag-without-blob failure mode from
+  // POS-140). Treat as a miss so we re-resolve rather than return a phantom null.
+  if (raw === null) return { ok: false };
+  // Legacy null marker (pre-envelope installs).
+  if (raw === NULL_SENTINEL) return { ok: true, result: null };
   try {
     const parsed = JSON.parse(raw) as unknown;
     if (parsed !== null && typeof parsed === "object" && "result" in parsed) {
-      const value = (parsed as CacheEnvelope).result;
-      return typeof value === "string" ? value : null;
+      const envelope = parsed as Partial<CacheEnvelope>;
+      // Versioned envelope with an unrecognised version → drop + re-resolve.
+      if ("version" in envelope && envelope.version !== CACHE_SCHEMA_VERSION) {
+        return { ok: false };
+      }
+      const value = envelope.result;
+      return { ok: true, result: typeof value === "string" ? value : null };
     }
   } catch {
     // Not a JSON envelope — treat as a legacy bare-string result.
   }
-  return raw;
+  return { ok: true, result: raw };
 }
 
 // In-memory cache: survives within a single JS runtime; cleared by resetSession().
@@ -69,11 +95,17 @@ async function readCache(
   const flag = await storage.getItem(StorageKeys.ATTRIBUTION_RESOLVED_FLAG_KEY);
   if (flag !== "true") return { hit: false };
   const raw = await storage.getItem(StorageKeys.ATTRIBUTION_CACHED_RESULT_KEY);
-  return { hit: true, result: decodeCachedResult(raw) };
+  const decoded = decodeCachedResult(raw);
+  // Missing / corrupt / version-mismatched blob → treat as a miss so we
+  // re-resolve rather than short-circuit on data we cannot trust.
+  if (!decoded.ok) return { hit: false };
+  return { hit: true, result: decoded.result };
 }
 
 async function writeCache(storage: RequiredConfig["storage"], result: PostedResult): Promise<void> {
-  const envelope: CacheEnvelope = { result };
+  const envelope: CacheEnvelope = { version: CACHE_SCHEMA_VERSION, result };
+  // Blob first, flag last: if the blob write throws, the flag is never set, so
+  // the fire-once short-circuit is never armed without a decodable result.
   await storage.setItem(StorageKeys.ATTRIBUTION_CACHED_RESULT_KEY, JSON.stringify(envelope));
   await storage.setItem(StorageKeys.ATTRIBUTION_RESOLVED_FLAG_KEY, "true");
 }

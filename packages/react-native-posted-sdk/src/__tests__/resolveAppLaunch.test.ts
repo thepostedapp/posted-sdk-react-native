@@ -372,9 +372,9 @@ describe("resolveAppLaunch", () => {
 
       const first = await resolveAppLaunch(makeConfig(storage));
       expect(first).toBe("https://example.com/envelope");
-      // Stored form is a self-describing JSON envelope, not a bare string.
+      // Stored form is a self-describing, versioned JSON envelope, not a bare string.
       expect(await storage.getItem(RESULT_KEY)).toBe(
-        JSON.stringify({ result: "https://example.com/envelope" }),
+        JSON.stringify({ version: 1, result: "https://example.com/envelope" }),
       );
 
       // Round-trip: fresh runtime (memory cleared, storage kept) reads it back with no network.
@@ -393,7 +393,7 @@ describe("resolveAppLaunch", () => {
 
       const first = await resolveAppLaunch(makeConfig(storage));
       expect(first).toBeNull();
-      expect(await storage.getItem(RESULT_KEY)).toBe(JSON.stringify({ result: null }));
+      expect(await storage.getItem(RESULT_KEY)).toBe(JSON.stringify({ version: 1, result: null }));
 
       // Round-trip: fresh runtime reads the null envelope back with no network.
       await resetSession();
@@ -430,6 +430,100 @@ describe("resolveAppLaunch", () => {
 
       expect(result).toBe("https://example.com/legacy");
       expect(calls).toHaveLength(0);
+    });
+  });
+
+  // -----------------------------------------------------------------------
+  // 8. Schema versioning & defensive persistence (POS-162)
+  // -----------------------------------------------------------------------
+  describe("schema versioning & defensive persistence", () => {
+    const RESULT_KEY = "Posted_attributionResult";
+    const FLAG_KEY = "Posted_attributionResolved";
+
+    it("stamps the current schema version on the persisted envelope", async () => {
+      mockLinking.getInitialURL.mockResolvedValue(null);
+      const storage = makeStorage();
+      mockFetch({ link: "https://example.com/versioned" });
+
+      await resolveAppLaunch(makeConfig(storage));
+
+      const stored = JSON.parse((await storage.getItem(RESULT_KEY))!) as {
+        version: number;
+        result: string | null;
+      };
+      expect(stored.version).toBe(1);
+      expect(stored.result).toBe("https://example.com/versioned");
+    });
+
+    it("drops a blob with an unrecognised version and re-resolves", async () => {
+      mockLinking.getInitialURL.mockResolvedValue(null);
+      const storage = makeStorage();
+      // A future/unknown schema version — must not be trusted.
+      await storage.setItem(FLAG_KEY, "true");
+      await storage.setItem(
+        RESULT_KEY,
+        JSON.stringify({ version: 99, result: "https://example.com/stale" }),
+      );
+
+      const calls = mockFetch({ link: "https://example.com/fresh" });
+      const result = await resolveAppLaunch(makeConfig(storage));
+
+      // Re-resolved rather than returning the stale, unrecognised-version blob.
+      expect(result).toBe("https://example.com/fresh");
+      expect(calls).toHaveLength(1);
+      // And the re-resolution rewrites the blob at the current version.
+      expect(await storage.getItem(RESULT_KEY)).toBe(
+        JSON.stringify({ version: 1, result: "https://example.com/fresh" }),
+      );
+    });
+
+    it("re-resolves when the flag is set but the blob is absent (flag-without-blob)", async () => {
+      mockLinking.getInitialURL.mockResolvedValue(null);
+      const storage = makeStorage();
+      // Simulate the iOS POS-140 failure mode: flag armed, no cached result.
+      await storage.setItem(FLAG_KEY, "true");
+
+      const calls = mockFetch({ link: "https://example.com/recovered" });
+      const result = await resolveAppLaunch(makeConfig(storage));
+
+      // Does not short-circuit to a phantom null — it re-resolves.
+      expect(result).toBe("https://example.com/recovered");
+      expect(calls).toHaveLength(1);
+    });
+
+    it("tolerates a legacy unversioned envelope with no network", async () => {
+      mockLinking.getInitialURL.mockResolvedValue(null);
+      const storage = makeStorage();
+      // POS-152 transitional envelope: {"result": ...} with no version field.
+      await storage.setItem(FLAG_KEY, "true");
+      await storage.setItem(RESULT_KEY, JSON.stringify({ result: "https://example.com/pos152" }));
+
+      const calls = mockFetch({});
+      const result = await resolveAppLaunch(makeConfig(storage));
+
+      expect(result).toBe("https://example.com/pos152");
+      expect(calls).toHaveLength(0);
+    });
+
+    it("does not arm the fire-once flag when persisting the blob fails", async () => {
+      mockLinking.getInitialURL.mockResolvedValue(null);
+      const storage = makeStorage();
+      // Blob write rejects (e.g. disk full / quota). Flag must never be set.
+      // Non-blob writes still persist, so the flag assertion below is meaningful:
+      // it proves the flag was never *attempted*, not merely dropped by the mock.
+      (storage.setItem as jest.Mock).mockImplementation(async (key: string, value: string) => {
+        if (key === RESULT_KEY) throw new Error("persist failure");
+        storage._store[key] = value;
+      });
+      const calls = mockFetch({ link: "https://example.com/unpersisted" });
+
+      // Result is still returned to the caller for this launch.
+      const result = await resolveAppLaunch(makeConfig(storage));
+      expect(result).toBe("https://example.com/unpersisted");
+      expect(calls).toHaveLength(1);
+
+      // But the flag was never armed → next launch re-resolves.
+      expect(storage._store[FLAG_KEY]).toBeUndefined();
     });
   });
 });

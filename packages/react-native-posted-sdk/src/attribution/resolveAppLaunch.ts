@@ -117,8 +117,15 @@ async function doResolve(config?: Config): Promise<PostedResult> {
   // Persist fire-once flag + result
   try {
     await writeCache(cfg.storage, result);
-  } catch {
-    // Storage failure is non-fatal; result is still returned.
+  } catch (error) {
+    // Storage write failed: the fire-once flag was NOT armed. The current result is
+    // still returned (non-fatal), but the next launch will re-resolve and re-fire the
+    // network call — silent cost/attribution drift. Log at debug level so the condition
+    // is diagnosable without adding noise to normal operation.
+    console.debug(
+      "🔗[Posted:STORAGE_WRITE_FAILED] Failed to persist fire-once flag; next launch will re-resolve.",
+      error,
+    );
   }
 
   memoryCache = { resolved: true, result };

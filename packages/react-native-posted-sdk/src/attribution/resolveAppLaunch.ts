@@ -70,6 +70,12 @@ let memoryCache: { resolved: true; result: PostedResult } | null = null;
 // rather than each firing an independent network call.
 let inFlight: Promise<PostedResult> | null = null;
 
+// Generation/epoch token. resetSession() bumps this synchronously so that a
+// resolution which started BEFORE the reset cannot persist its result or
+// re-populate the caches afterwards — otherwise a doResolve() already in flight
+// would re-arm fire-once immediately after an intended reset. See POS-154.
+let generation = 0;
+
 function resolveConfig(config?: Config): RequiredConfig {
   if (config) {
     return {
@@ -140,11 +146,17 @@ async function resolveLinkPresent(cfg: RequiredConfig, url: string): Promise<Pos
 
 async function doResolve(config?: Config): Promise<PostedResult> {
   const cfg = resolveConfig(config);
+  // Snapshot the generation at the start; if resetSession() runs while this
+  // resolution is in flight, the token changes and we must not touch the caches.
+  const startGeneration = generation;
 
   // Persistent cache (survives app restarts and updates on the same install)
   const cached = await readCache(cfg.storage);
   if (cached.hit) {
-    memoryCache = { resolved: true, result: cached.result };
+    // Only re-populate the in-memory cache if no reset landed during the read.
+    if (generation === startGeneration) {
+      memoryCache = { resolved: true, result: cached.result };
+    }
     return cached.result;
   }
 
@@ -168,11 +180,24 @@ async function doResolve(config?: Config): Promise<PostedResult> {
     return null;
   }
 
+  // If resetSession() ran while this resolution was in flight, the reset must
+  // win: do NOT persist the fire-once flag or populate the in-memory cache, as
+  // that would silently re-arm fire-once right after the intended reset. The
+  // resolved value is still returned to the original caller.
+  if (generation !== startGeneration) {
+    return result;
+  }
+
   // Persist fire-once flag + result
   try {
     await writeCache(cfg.storage, result);
   } catch {
     // Storage failure is non-fatal; result is still returned.
+  }
+
+  // Re-check: a reset may have landed during the storage write above.
+  if (generation !== startGeneration) {
+    return result;
   }
 
   memoryCache = { resolved: true, result };
@@ -207,11 +232,16 @@ export const resolveAppLaunch = async (
     return inFlight;
   }
 
-  inFlight = doResolve(config);
+  const pending = doResolve(config);
+  inFlight = pending;
   try {
-    return await inFlight;
+    return await pending;
   } finally {
-    inFlight = null;
+    // Only clear if still ours: resetSession() (or a newer call) may have
+    // already replaced inFlight, and we must not clobber that newer state.
+    if (inFlight === pending) {
+      inFlight = null;
+    }
   }
 };
 
@@ -222,6 +252,10 @@ export const resolveAppLaunch = async (
  * Designed for: explicit logout/reinstall flows, QA, and testing.
  */
 export const resetSession = async (config?: Config): Promise<void> => {
+  // Bump the generation token FIRST, synchronously and before any await, so any
+  // resolution already in flight is invalidated the instant the reset begins.
+  generation += 1;
+
   const cfg = config ? resolveConfig(config) : getGlobalConfig();
 
   // Clear both caches unconditionally.

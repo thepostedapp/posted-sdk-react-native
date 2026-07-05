@@ -9,8 +9,33 @@ import { StorageKeys } from "../links/utils/storage";
 import { isInfrastructureUrl, isWebUrl } from "../links/utils/urlHelpers";
 import { getGlobalConfig } from "./configure";
 
-// Sentinel stored for a null result so fire-once flag is still honoured.
+// Legacy sentinel that older installs stored for a null result. No longer
+// written (superseded by the JSON envelope below) but still READ so an existing
+// install's fire-once flag survives an app update. See POS-152.
 const NULL_SENTINEL = "\x00";
+
+// Persisted result is a self-describing JSON envelope: {"result": <string|null>}.
+// This avoids any theoretical collision with a real attributed value and leaves
+// room for future fields without changing the storage contract.
+type CacheEnvelope = { result: PostedResult };
+
+// Decode a persisted cached-result value across formats:
+//   - JSON envelope ({"result": ...}) — current format
+//   - NULL_SENTINEL / null — legacy null marker
+//   - bare string — legacy result written before the envelope existed
+function decodeCachedResult(raw: string | null): PostedResult {
+  if (raw === null || raw === NULL_SENTINEL) return null;
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    if (parsed !== null && typeof parsed === "object" && "result" in parsed) {
+      const value = (parsed as CacheEnvelope).result;
+      return typeof value === "string" ? value : null;
+    }
+  } catch {
+    // Not a JSON envelope — treat as a legacy bare-string result.
+  }
+  return raw;
+}
 
 // In-memory cache: survives within a single JS runtime; cleared by resetSession().
 let memoryCache: { resolved: true; result: PostedResult } | null = null;
@@ -44,15 +69,12 @@ async function readCache(
   const flag = await storage.getItem(StorageKeys.ATTRIBUTION_RESOLVED_FLAG_KEY);
   if (flag !== "true") return { hit: false };
   const raw = await storage.getItem(StorageKeys.ATTRIBUTION_CACHED_RESULT_KEY);
-  const result = raw === null || raw === NULL_SENTINEL ? null : raw;
-  return { hit: true, result };
+  return { hit: true, result: decodeCachedResult(raw) };
 }
 
 async function writeCache(storage: RequiredConfig["storage"], result: PostedResult): Promise<void> {
-  await storage.setItem(
-    StorageKeys.ATTRIBUTION_CACHED_RESULT_KEY,
-    result !== null ? result : NULL_SENTINEL,
-  );
+  const envelope: CacheEnvelope = { result };
+  await storage.setItem(StorageKeys.ATTRIBUTION_CACHED_RESULT_KEY, JSON.stringify(envelope));
   await storage.setItem(StorageKeys.ATTRIBUTION_RESOLVED_FLAG_KEY, "true");
 }
 

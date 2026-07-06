@@ -4,7 +4,7 @@ import { postedConfig } from "./_layout";
 
 // TODO(B4): update host pattern to new short-link domain once confirmed.
 const postedNativeIntentHandler = createPostedNativeIntentHandler({
-  hosts: [/\.godetour\.link$/i],
+  hosts: [/\.posted\.link$/i],
   config: postedConfig,
   mapToRoute: ({ resolvedUrl }) => {
     // Example of a custom mapping function that transforms the resolved URL into an app route.

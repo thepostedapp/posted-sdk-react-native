@@ -4,7 +4,7 @@ import { createPostedNativeIntentHandler } from "@posted-sdk/react-native/expo-r
 // Linking.getInitialURL() — the splash screen covers that async wait.
 const postedHandler = createPostedNativeIntentHandler({
   // TODO(B4): update host pattern to new short-link domain once confirmed.
-  hosts: [/\.godetour\.link$/i],
+  hosts: [/\.posted\.link$/i],
   fallbackPath: "/",
 });
 

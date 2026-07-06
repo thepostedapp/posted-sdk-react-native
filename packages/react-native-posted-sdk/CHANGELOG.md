@@ -8,6 +8,26 @@ All notable changes to `@posted-sdk/react-native` are documented here.
 attribution-first entry point, `resolveAppLaunch(config)`. For the full upgrade path
 see [MIGRATION.md](./MIGRATION.md) §7–§9.
 
+### Rebrand — backend/short-link domains, package metadata & `posted://`
+
+3.0.0 finalizes the migration off the legacy `godetour.*` domains onto the `posted`
+domains. **No public API surface changes** beyond the domain/metadata values below;
+symbol names are unchanged from 2.0.0.
+
+- **Backend API base**: `godetour.dev` → `api.posted.app` (analytics + link endpoints).
+  Request/response contract and paths are unchanged.
+- **Default short-link domain**: `godetour.link` → `posted.link` (`DEFAULT_HOSTS` in the
+  Expo Router native-intent handler, example associated-domains / intent-filters).
+- **Custom URL scheme**: `posted://` is the app scheme (unchanged since 2.0.0). The
+  example apps now register `posted://` explicitly (iOS `CFBundleURLSchemes` /
+  Android intent-filter via the Expo `scheme` array) alongside the `resolveAppLaunch`
+  flow.
+- **Package metadata**: `repository` / `bugs` / `homepage` → the
+  `posted-sdk-react-native` GitHub repo; contact email → `yuriy@postedapp.com`.
+
+These values are canonical per the POS-312 V3 confirmation and pending final board
+ratification.
+
 ### New public surface
 
 - **`resolveAppLaunch(config?)`** — resolves attribution for the current app launch and
@@ -69,4 +89,4 @@ All old `Detour*` names are re-exported as `@deprecated` aliases in 2.0.0 so you
 
 ### Short-link domain
 
-The short-link domain used in example apps and associated-domain configuration is `godetour.link` until the new domain (pending [POS-44](https://github.com/thepostedapp/react-native-detour)) goes live. When the new domain is confirmed, update `DEFAULT_HOSTS` and your app's associated domains accordingly.
+The short-link domain used in example apps and associated-domain configuration was `godetour.link` in 2.0.0. It is `posted.link` as of 3.0.0 — see the 3.0.0 rebrand notes above.

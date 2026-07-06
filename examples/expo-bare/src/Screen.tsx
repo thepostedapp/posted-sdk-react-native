@@ -43,13 +43,13 @@ export const Screen = () => {
             Uninstall the app or clear its data, open a Posted link in the mobile browser, then
             install and launch — the SDK resolves the link automatically.
           </Text>
-          <Text style={styles.code}>https://&lt;your-org&gt;.godetour.link/&lt;hash&gt;/</Text>
+          <Text style={styles.code}>https://&lt;your-org&gt;.posted.link/&lt;hash&gt;/</Text>
 
           <Text style={styles.sectionHeader}>Universal / App Link</Text>
           <Text style={styles.bullet}>
             Open in browser or paste into Notes/Messages and tap — iOS/Android will launch the app.
           </Text>
-          <Text style={styles.code}>https://&lt;your-org&gt;.godetour.link/&lt;hash&gt;/</Text>
+          <Text style={styles.code}>https://&lt;your-org&gt;.posted.link/&lt;hash&gt;/</Text>
 
           <View style={styles.divider} />
 

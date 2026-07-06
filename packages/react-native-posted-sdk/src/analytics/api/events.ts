@@ -3,8 +3,8 @@ import { Platform } from "react-native";
 import { SDK_HEADER_VALUE } from "../../version";
 import type { PostedEvent } from "../types";
 
-// TODO(B3): update to new backend domain once confirmed — https://github.com/posted-attribution/react-native-posted-sdk/issues
-const EVENT_API_URL = "https://godetour.dev/api/analytics/event";
+// Backend API base: api.posted.app (canonical per POS-312 V3; final value pending board ratification).
+const EVENT_API_URL = "https://api.posted.app/api/analytics/event";
 
 export const sendEvent = async ({
   apiKey,

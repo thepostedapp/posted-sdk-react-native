@@ -5,13 +5,13 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/posted-logo.png",
-    "scheme": "posted-expo-router",
+    "scheme": ["posted", "posted-expo-router"],
     "newArchEnabled": true,
     "ios": {
       "bundleIdentifier": "com.postedapp.exporouter",
       "supportsTablet": true,
       "icon": "./assets/posted-logo.png",
-      "associatedDomains": ["applinks:<your-org>.godetour.link"]
+      "associatedDomains": ["applinks:<your-org>.posted.link"]
     },
     "android": {
       "package": "com.postedapp.exporouter",
@@ -27,7 +27,7 @@
           "data": [
             {
               "scheme": "https",
-              "host": "<your-org>.godetour.link",
+              "host": "<your-org>.posted.link",
               "pathPrefix": "/<your-app-hash>"
             }
           ],

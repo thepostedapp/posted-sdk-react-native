@@ -6,8 +6,8 @@ import { SDK_HEADER_VALUE } from "../../version";
 import type { RequiredConfig } from "../types";
 import { getSyncDeviceInfo } from "../utils/deviceInfo";
 
-// TODO(B3): update to new backend domain once confirmed — https://github.com/posted-attribution/react-native-posted-sdk/issues
-const API_URL = "https://godetour.dev/api/link/universal-link-click";
+// Backend API base: api.posted.app (canonical per POS-312 V3; final value pending board ratification).
+const API_URL = "https://api.posted.app/api/link/universal-link-click";
 
 type UniversalLinkClickResponseBody = {
   allowed?: boolean;

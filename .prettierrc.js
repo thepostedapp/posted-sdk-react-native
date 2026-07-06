@@ -19,7 +19,7 @@ module.exports = {
     // Third-party packages
     "<THIRD_PARTY_MODULES>",
     // Internal monorepo packages
-    "^@swmansion/(.*)$",
+    "^@posted-sdk/(.*)$",
     // Relative imports
     "^[./]",
   ],

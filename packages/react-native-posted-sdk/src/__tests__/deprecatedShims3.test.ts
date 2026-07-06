@@ -239,7 +239,7 @@ describe("Deprecated 3.0.0 shims", () => {
       const result = await SDK.resolveInitialLink(makeConfig(makeStorage()));
       expect(result).toBe("https://example.com/promo");
       expect((global.fetch as jest.Mock).mock.calls[0]![0]).toBe(
-        "https://godetour.dev/api/link/match-link",
+        "https://api.posted.app/api/link/match-link",
       );
     });
 
@@ -252,7 +252,7 @@ describe("Deprecated 3.0.0 shims", () => {
       expect(result).toBe("https://example.com/link");
       // Should call match-link (deferred branch, no Linking URL)
       expect((global.fetch as jest.Mock).mock.calls[0]![0]).toBe(
-        "https://godetour.dev/api/link/match-link",
+        "https://api.posted.app/api/link/match-link",
       );
     });
 

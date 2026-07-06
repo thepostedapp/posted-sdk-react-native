@@ -2,7 +2,7 @@
 
 This guide covers upgrading from any `@swmansion/react-native-detour` version to `@posted-sdk/react-native` 2.0.0.
 
-For the canonical cross-platform naming scheme see the [POS-8 plan](https://github.com/thepostedapp/react-native-detour/issues) (internal board link: `/POS/issues/POS-8#document-plan`).
+For the canonical cross-platform naming scheme see the [POS-8 plan](https://github.com/posted-attribution/posted-sdk-react-native/issues) (internal board link: `/POS/issues/POS-8#document-plan`).
 
 ---
 
@@ -98,13 +98,16 @@ The linking prefix constant now reflects the new scheme:
 
 ## 4. Update associated domains / short-link domain
 
-The short-link domain is `godetour.link` in the current release. Update your `app.json` associated domains:
+The short-link domain is `posted.link` as of 3.0.0 (it was `godetour.link` in 2.0.0). Update your `app.json` associated domains:
 
 ```json
-"associatedDomains": ["applinks:<your-org>.godetour.link"]
+"associatedDomains": ["applinks:<your-org>.posted.link"]
 ```
 
-The production domain will be updated in a future release once the new domain is confirmed (see [POS-44](https://github.com/thepostedapp/react-native-detour/issues) — internal release gate). Check the CHANGELOG for updates.
+> **Universal Links are optional for v1.** Attribution (probabilistic + deterministic:
+> install-referrer, iOS clipboard, and the `posted://` scheme) works without associated
+> domains / AASA / assetlinks. The associated-domain config above is only needed if you
+> also want tap-to-open Universal Links.
 
 ---
 

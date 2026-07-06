@@ -1,6 +1,6 @@
 {
   "name": "@posted-sdk/react-native",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "SDK for handling deferred links — posted-sdk React Native package",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
@@ -53,14 +53,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/posted-attribution/react-native-posted-sdk.git"
+    "url": "git+https://github.com/posted-attribution/posted-sdk-react-native.git"
   },
-  "author": "postedapp <team@postedapp.com>",
+  "author": "postedapp <yuriy@postedapp.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/posted-attribution/react-native-posted-sdk/issues"
+    "url": "https://github.com/posted-attribution/posted-sdk-react-native/issues"
   },
-  "homepage": "https://github.com/posted-attribution/react-native-posted-sdk#readme",
+  "homepage": "https://github.com/posted-attribution/posted-sdk-react-native#readme",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/",

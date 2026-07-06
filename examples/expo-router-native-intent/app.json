@@ -6,12 +6,12 @@
     "orientation": "portrait",
     "icon": "./assets/posted-logo.png",
     "newArchEnabled": true,
-    "scheme": "posted-expo-router-native-intent",
+    "scheme": ["posted", "posted-expo-router-native-intent"],
     "ios": {
       "bundleIdentifier": "com.postedapp.exporouternativeintent",
       "supportsTablet": true,
       "icon": "./assets/posted-logo.png",
-      "associatedDomains": ["applinks:<your-org>.godetour.link"]
+      "associatedDomains": ["applinks:<your-org>.posted.link"]
     },
     "android": {
       "package": "com.postedapp.exporouternativeintent",
@@ -27,7 +27,7 @@
           "data": [
             {
               "scheme": "https",
-              "host": "<your-org>.godetour.link",
+              "host": "<your-org>.posted.link",
               "pathPrefix": "/<your-app-hash>"
             }
           ],

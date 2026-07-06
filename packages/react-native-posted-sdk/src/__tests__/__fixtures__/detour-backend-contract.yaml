@@ -13,7 +13,7 @@ info:
     with every shape they parse.
 
     ## Conventions
-    - All endpoints are `POST`, `application/json`, over HTTPS to `https://godetour.dev`.
+    - All endpoints are `POST`, `application/json`, over HTTPS to `https://api.posted.app`.
     - No compression, no HMAC/request signing, no idempotency keys, no client retries.
     - Two timestamp conventions (intentional, see schemas): **epoch milliseconds** on the
       link endpoints, **ISO-8601 UTC** (`yyyy-MM-dd'T'HH:mm:ss.SSS'Z'`) on analytics.
@@ -29,7 +29,7 @@ info:
       never parsed; only the HTTP status is checked.
 
 servers:
-  - url: https://godetour.dev
+  - url: https://api.posted.app
     description: Production (hardcoded in every SDK; not configurable)
 
 security:
@@ -263,7 +263,7 @@ paths:
               examples:
                 matched:
                   value:
-                    link: "https://godetour.dev/app/promo?ref=spring"
+                    link: "https://posted.link/app/promo?ref=spring"
                 noMatch:
                   value:
                     link: null
@@ -291,7 +291,7 @@ paths:
             examples:
               shortLink:
                 value:
-                  url: "https://godetour.dev/x9Az"
+                  url: "https://posted.link/x9Az"
       responses:
         '200':
           description: Resolved link. Returning the input URL unchanged is treated as a loop and ignored.
@@ -301,12 +301,12 @@ paths:
               examples:
                 resolved:
                   value:
-                    link: "https://godetour.dev/app/product/42"
+                    link: "https://posted.link/app/product/42"
                     route: "/product/42"
                     parameters: '{"color":"red"}'
                 linkOnly:
                   value:
-                    link: "https://godetour.dev/app/product/42"
+                    link: "https://posted.link/app/product/42"
         '404':
           description: Short link not found — SDK falls back to the raw URL.
         default:
@@ -330,7 +330,7 @@ paths:
               click:
                 summary: iOS click with query params and metadata.
                 value:
-                  url: "https://godetour.dev/u/launch?campaign=spring&variant=b"
+                  url: "https://posted.link/u/launch?campaign=spring&variant=b"
                   timestamp: 1719158400000
                   platform: ios
                   link_id: "lnk_5567"
@@ -344,7 +344,7 @@ paths:
               clickMinimal:
                 summary: Android minimal click (optional fields omitted entirely).
                 value:
-                  url: "https://godetour.dev/u/launch"
+                  url: "https://posted.link/u/launch"
                   timestamp: 1719158400000
                   platform: android
       responses:

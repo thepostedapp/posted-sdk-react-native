@@ -73,7 +73,7 @@ export type PostedNativeIntentOptions = {
    * - `go.example.com` (exact match)
    * - `*.example.com` (suffix wildcard)
    *
-   * Defaults to `*.godetour.link` (TODO(B4): will be updated to the new short-link domain).
+   * Defaults to `*.posted.link`.
    */
   hosts?: Array<string | RegExp>;
   /**
@@ -93,8 +93,8 @@ export type PostedNativeIntentOptions = {
   mapToRoute?: (value: PostedNativeIntentResolvedValue) => string;
 };
 
-// TODO(B4): update to new short-link domain once confirmed — https://github.com/posted-attribution/react-native-posted-sdk/issues
-const DEFAULT_HOSTS: Array<string | RegExp> = [/\.godetour\.link$/i];
+// Default short-link domain: posted.link (canonical per POS-312 V3; final value pending board ratification).
+const DEFAULT_HOSTS: Array<string | RegExp> = [/\.posted\.link$/i];
 const DEFAULT_TIMEOUT_MS = 1200;
 
 const isRegExpMatch = (pattern: RegExp, value: string) => {
@@ -231,8 +231,7 @@ const withTimeout = async <T>(promise: Promise<T>, timeoutMs: number) => {
  * - or resolves short links + maps to route (resolve mode),
  * - otherwise returns the original path unchanged.
  *
- * By default, it matches any URL with a hostname ending in `.godetour.link`
- * (TODO(B4): will be updated to the new short-link domain once confirmed).
+ * By default, it matches any URL with a hostname ending in `.posted.link`.
  *
  * @param options Configuration for host matching, fallback path, and optional resolve mode.
  * @returns A `redirectSystemPath` handler function compatible with Expo Router.

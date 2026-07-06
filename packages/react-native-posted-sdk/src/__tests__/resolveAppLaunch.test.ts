@@ -259,6 +259,48 @@ describe("resolveAppLaunch", () => {
   });
 
   // -----------------------------------------------------------------------
+  // 3b. Storage write failure — observability (POS-153)
+  // -----------------------------------------------------------------------
+  describe("storage write failure observability", () => {
+    it("logs a debug-level message when the fire-once flag cannot be persisted", async () => {
+      mockLinking.getInitialURL.mockResolvedValue(null);
+      const storage = makeStorage();
+      // setItem throws → writeCache rejects → fire-once flag never arms
+      (storage.setItem as jest.Mock).mockRejectedValue(new Error("disk full"));
+      mockFetch({ link: "https://example.com/promo" });
+
+      const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+
+      // Resolution still succeeds (write failure is non-fatal)
+      const result = await resolveAppLaunch(makeConfig(storage));
+      expect(result).toBe("https://example.com/promo");
+
+      // The failure is surfaced at debug level with the 🔗[Posted] prefix
+      expect(debugSpy).toHaveBeenCalledTimes(1);
+      const [message, error] = debugSpy.mock.calls[0]!;
+      expect(message).toContain("🔗[Posted:STORAGE_WRITE_FAILED]");
+      expect(error).toBeInstanceOf(Error);
+      expect((error as Error).message).toBe("disk full");
+
+      debugSpy.mockRestore();
+    });
+
+    it("does not log on a successful storage write", async () => {
+      mockLinking.getInitialURL.mockResolvedValue(null);
+      const storage = makeStorage();
+      mockFetch({ link: "https://example.com/promo" });
+
+      const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+
+      await resolveAppLaunch(makeConfig(storage));
+
+      expect(debugSpy).not.toHaveBeenCalled();
+
+      debugSpy.mockRestore();
+    });
+  });
+
+  // -----------------------------------------------------------------------
   // 4. Concurrent calls — single-flight guard
   // -----------------------------------------------------------------------
   describe("single-flight guard (concurrent calls)", () => {

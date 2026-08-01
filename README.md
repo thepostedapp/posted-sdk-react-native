@@ -11,7 +11,8 @@ posted-sdk React Native (`@posted-sdk/react-native`) is an SDK for handling defe
 
 ## Create an account
 
-You need a posted-sdk account to generate app credentials and configure your links.  
+You need a posted-sdk account to generate app credentials and configure your links.
+
 <!-- TODO(B3): update sign-up URL once new backend domain is live -->
 
 ## Installation
@@ -449,20 +450,21 @@ Posted.addEventListener("url", (event: PostedUrlEvent) => void): PostedUrlSubscr
 
 The package has been renamed. Update your imports:
 
-| Old (`@swmansion/react-native-detour`) | New (`@posted-sdk/react-native`) |
-| -------------------------------------- | -------------------------------- |
-| `DetourProvider` | `PostedProvider` |
-| `useDetourContext` | `usePostedContext` |
-| `Detour` | `Posted` |
-| `DETOUR_LINKING_PREFIX` | `POSTED_LINKING_PREFIX` |
-| `DetourAnalytics` | `PostedAnalytics` |
-| `DetourEventNames` | `PostedEventNames` |
-| `DetourContextType` | `PostedContextType` |
-| `DetourLink` | `PostedLink` |
-| `DetourStorage` | `PostedStorage` |
-| `createDetourNativeIntentHandler` | `createPostedNativeIntentHandler` |
+| Old (`@swmansion/react-native-detour`) | New (`@posted-sdk/react-native`)  |
+| -------------------------------------- | --------------------------------- |
+| `DetourProvider`                       | `PostedProvider`                  |
+| `useDetourContext`                     | `usePostedContext`                |
+| `Detour`                               | `Posted`                          |
+| `DETOUR_LINKING_PREFIX`                | `POSTED_LINKING_PREFIX`           |
+| `DetourAnalytics`                      | `PostedAnalytics`                 |
+| `DetourEventNames`                     | `PostedEventNames`                |
+| `DetourContextType`                    | `PostedContextType`               |
+| `DetourLink`                           | `PostedLink`                      |
+| `DetourStorage`                        | `PostedStorage`                   |
+| `createDetourNativeIntentHandler`      | `createPostedNativeIntentHandler` |
 
-The old names are exported as deprecated re-exports in `2.0.0` for one minor cycle to ease migration.
+The old names were exported as deprecated re-exports from `2.0.0` to ease migration; they
+were removed in `4.0.0`. See [`MIGRATION.md`](./packages/react-native-posted-sdk/MIGRATION.md) §5.
 
 ### 3.0.0 — link methods → `resolveAppLaunch`
 

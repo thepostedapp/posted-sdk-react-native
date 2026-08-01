@@ -746,4 +746,51 @@ describe("resolveAppLaunch", () => {
       await expectStoredResult(storage, "https://example.com/fresh");
     });
   });
+
+  // -----------------------------------------------------------------------
+  // 10. Torn-clear safety in resetSession() (POS-477)
+  // -----------------------------------------------------------------------
+  describe("resetSession torn-clear safety (POS-477)", () => {
+    const RESULT_KEY = "Posted_attributionResult";
+    const FLAG_KEY = "Posted_attributionResolved";
+
+    it("treats a torn clear (flag removed, blob left behind) as a cache miss and re-resolves", async () => {
+      mockLinking.getInitialURL.mockResolvedValue(null);
+      const storage = makeStorage();
+      // Simulate the state left behind by a resetSession() that died between its two
+      // removeItem calls: the flag (removed first) is gone, but the result blob
+      // (removed second) never got cleared.
+      await storage.setItem(FLAG_KEY, "true");
+      await storage.setItem(RESULT_KEY, storedEnvelope("https://example.com/stale-after-torn-clear"));
+      await storage.removeItem!(FLAG_KEY);
+
+      const calls = mockFetch({ link: "https://example.com/after-torn-clear" });
+      const result = await resolveAppLaunch(makeConfig(storage));
+
+      // The leftover blob must NOT be trusted — absence of the flag alone forces a
+      // fresh resolution rather than a phantom cache hit.
+      expect(result).toBe("https://example.com/after-torn-clear");
+      expect(calls).toHaveLength(1);
+      await expectStoredResult(storage, "https://example.com/after-torn-clear");
+    });
+
+    it("uses multiRemove for an atomic batch clear when the storage backend supports it", async () => {
+      mockLinking.getInitialURL.mockResolvedValue(null);
+      const storage = makeStorage();
+      const multiRemove = jest.fn(async (keys: string[]) => {
+        keys.forEach((key) => delete storage._store[key]);
+      });
+      storage.multiRemove = multiRemove;
+      mockFetch({ link: "https://example.com/item" });
+
+      await resolveAppLaunch(makeConfig(storage));
+      await resetSession(makeConfig(storage));
+
+      expect(multiRemove).toHaveBeenCalledWith([FLAG_KEY, RESULT_KEY]);
+      // multiRemove path is preferred: sequential removeItem must not also run.
+      expect(storage.removeItem).not.toHaveBeenCalled();
+      expect(await storage.getItem(FLAG_KEY)).toBeNull();
+      expect(await storage.getItem(RESULT_KEY)).toBeNull();
+    });
+  });
 });

@@ -289,8 +289,27 @@ export const resetSession = async (config?: Config): Promise<void> => {
   if (!cfg) return;
 
   try {
-    await cfg.storage.removeItem?.(StorageKeys.ATTRIBUTION_RESOLVED_FLAG_KEY);
-    await cfg.storage.removeItem?.(StorageKeys.ATTRIBUTION_CACHED_RESULT_KEY);
+    if (cfg.storage.multiRemove) {
+      // Atomic batch clear when the backend supports it (e.g. AsyncStorage.multiRemove)
+      // — both keys commit together, so there is no torn-clear window at all.
+      await cfg.storage.multiRemove([
+        StorageKeys.ATTRIBUTION_RESOLVED_FLAG_KEY,
+        StorageKeys.ATTRIBUTION_CACHED_RESULT_KEY,
+      ]);
+    } else {
+      // Sequential fallback: the flag MUST be removed FIRST, the result blob
+      // second. If the process dies/crashes between the two awaits, the flag
+      // is already gone while the blob may still linger — that torn state is
+      // still safe because readCache() (above) requires flag === 'true' before
+      // it will even look at the blob, so a missing flag is an unconditional
+      // cache miss regardless of what's left in the blob key. Clearing in the
+      // opposite order would risk the flag surviving alone with no blob, which
+      // is also handled as a miss (flag-without-blob, POS-140) but would mean
+      // relying on a second, separate invariant instead of the single
+      // "no flag ⇒ no trust" rule this ordering preserves. See POS-477.
+      await cfg.storage.removeItem?.(StorageKeys.ATTRIBUTION_RESOLVED_FLAG_KEY);
+      await cfg.storage.removeItem?.(StorageKeys.ATTRIBUTION_CACHED_RESULT_KEY);
+    }
   } catch {
     // Storage errors are non-fatal.
   }

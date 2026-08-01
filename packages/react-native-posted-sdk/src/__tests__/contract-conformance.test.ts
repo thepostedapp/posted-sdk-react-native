@@ -55,6 +55,8 @@ import { sendEvent } from "../analytics/api/events";
 import { sendRetentionEvent } from "../analytics/api/retention";
 import { SDK_HEADER_VALUE } from "../version";
 import { PostedEventNames } from "../analytics/types";
+import { resolveAppLaunch, resetSession } from "../attribution/resolveAppLaunch";
+import type { PostedStorage } from "../links/types";
 
 // ---- Contract + AJV setup ----
 
@@ -385,6 +387,89 @@ describe("RN SDK → backend contract conformance", () => {
       expect(Object.prototype.hasOwnProperty.call(b, "data")).toBe(false);
 
       assertSchemaValid(validateRetentionEvent, body, "RetentionEventRequest");
+    });
+  });
+
+  // -----------------------------------------------------------------------
+  // 7. resolveAppLaunch → match-link conformance — POS-437
+  //
+  // Drives the PUBLIC resolveAppLaunch() one-shot (not the deprecated
+  // low-level getDeferredLink exercised above) to guard that the 3.0.0
+  // facade still emits a contract-valid match-link payload on both
+  // branches. No launch URL is present in either case, so resolveAppLaunch
+  // routes through the deferred (match-link) path internally.
+  // -----------------------------------------------------------------------
+  describe("resolveAppLaunch → match-link conformance", () => {
+    function makeStorage(): PostedStorage {
+      const store: Record<string, string> = {};
+      return {
+        getItem: jest.fn(async (key: string) => store[key] ?? null),
+        setItem: jest.fn(async (key: string, value: string) => {
+          store[key] = value;
+        }),
+        removeItem: jest.fn(async (key: string) => {
+          delete store[key];
+        }),
+      };
+    }
+
+    beforeEach(async () => {
+      // resolveAppLaunch's fire-once cache is module-level (independent of
+      // which storage instance is passed), so a fresh storage object alone
+      // does not force a re-resolution. resetSession() clears it explicitly
+      // so each test's call actually fires the network request.
+      await resetSession();
+    });
+
+    it("deterministic branch: install-referrer click_id emits a DeterministicMatch body", async () => {
+      appMock.getInstallReferrerAsync.mockResolvedValue("click_id=abc123-click-789");
+      const calls = mockFetch({ link: null });
+
+      await resolveAppLaunch({
+        apiKey: API_KEY,
+        appID: APP_ID,
+        storage: makeStorage(),
+        shouldUseClipboard: false,
+      });
+
+      expect(calls).toHaveLength(1);
+      const { url, method, headers, body } = calls[0]!;
+
+      expect(url).toBe("https://api.posted.app/api/link/match-link");
+      expect(method).toBe("POST");
+      assertCommonHeaders(headers);
+
+      expect(body).toEqual({ clickId: "abc123-click-789" });
+      assertSchemaValid(validateDeterministicMatch, body, "DeterministicMatch");
+      assertSchemaValid(validateMatchLinkBody, body, "match-link oneOf");
+    });
+
+    it("probabilistic branch: no install-referrer emits a ProbabilisticFingerprint body", async () => {
+      appMock.getInstallReferrerAsync.mockResolvedValue(null);
+      const calls = mockFetch({ link: null });
+
+      await resolveAppLaunch({
+        apiKey: API_KEY,
+        appID: APP_ID,
+        storage: makeStorage(),
+        shouldUseClipboard: false,
+      });
+
+      expect(calls).toHaveLength(1);
+      const { url, method, headers, body } = calls[0]!;
+
+      expect(url).toBe("https://api.posted.app/api/link/match-link");
+      expect(method).toBe("POST");
+      assertCommonHeaders(headers);
+
+      const fp = body as Record<string, unknown>;
+      expect(typeof fp.timestamp).toBe("number");
+      expect(Number.isInteger(fp.timestamp)).toBe(true);
+      expect(["ios", "android"]).toContain(fp.platform);
+      expect(Array.isArray(fp.locale)).toBe(true);
+
+      assertSchemaValid(validateProbabilisticFingerprint, body, "ProbabilisticFingerprint");
+      assertSchemaValid(validateMatchLinkBody, body, "match-link oneOf");
     });
   });
 });

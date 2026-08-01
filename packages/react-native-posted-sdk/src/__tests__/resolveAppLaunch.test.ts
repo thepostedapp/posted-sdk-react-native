@@ -84,6 +84,20 @@ function makeConfig(storage: PostedStorage) {
   return { apiKey: API_KEY, appID: APP_ID, storage };
 }
 
+// Current cached-result envelope schema version (mirrors CACHE_SCHEMA_VERSION
+// in resolveAppLaunch.ts). Kept as a single constant + helper pair so a future
+// envelope/schema-version change only needs updating here, not at every
+// assertion site across the suite.
+const CURRENT_ENVELOPE_VERSION = 1;
+
+function storedEnvelope(value: string | null, version = CURRENT_ENVELOPE_VERSION): string {
+  return JSON.stringify({ version, result: value });
+}
+
+async function expectStoredResult(storage: PostedStorage, value: string | null): Promise<void> {
+  expect(await storage.getItem("Posted_attributionResult")).toBe(storedEnvelope(value));
+}
+
 type FetchCall = { url: string; method: string; body: unknown };
 
 function mockFetch(responseBody: object, status = 200): FetchCall[] {
@@ -415,9 +429,7 @@ describe("resolveAppLaunch", () => {
       const first = await resolveAppLaunch(makeConfig(storage));
       expect(first).toBe("https://example.com/envelope");
       // Stored form is a self-describing, versioned JSON envelope, not a bare string.
-      expect(await storage.getItem(RESULT_KEY)).toBe(
-        JSON.stringify({ version: 1, result: "https://example.com/envelope" }),
-      );
+      await expectStoredResult(storage, "https://example.com/envelope");
 
       // Round-trip: fresh runtime (memory cleared, storage kept) reads it back with no network.
       await resetSession();
@@ -435,7 +447,7 @@ describe("resolveAppLaunch", () => {
 
       const first = await resolveAppLaunch(makeConfig(storage));
       expect(first).toBeNull();
-      expect(await storage.getItem(RESULT_KEY)).toBe(JSON.stringify({ version: 1, result: null }));
+      await expectStoredResult(storage, null);
 
       // Round-trip: fresh runtime reads the null envelope back with no network.
       await resetSession();
@@ -493,7 +505,7 @@ describe("resolveAppLaunch", () => {
         version: number;
         result: string | null;
       };
-      expect(stored.version).toBe(1);
+      expect(stored.version).toBe(CURRENT_ENVELOPE_VERSION);
       expect(stored.result).toBe("https://example.com/versioned");
     });
 
@@ -502,10 +514,7 @@ describe("resolveAppLaunch", () => {
       const storage = makeStorage();
       // A future/unknown schema version — must not be trusted.
       await storage.setItem(FLAG_KEY, "true");
-      await storage.setItem(
-        RESULT_KEY,
-        JSON.stringify({ version: 99, result: "https://example.com/stale" }),
-      );
+      await storage.setItem(RESULT_KEY, storedEnvelope("https://example.com/stale", 99));
 
       const calls = mockFetch({ link: "https://example.com/fresh" });
       const result = await resolveAppLaunch(makeConfig(storage));
@@ -514,9 +523,7 @@ describe("resolveAppLaunch", () => {
       expect(result).toBe("https://example.com/fresh");
       expect(calls).toHaveLength(1);
       // And the re-resolution rewrites the blob at the current version.
-      expect(await storage.getItem(RESULT_KEY)).toBe(
-        JSON.stringify({ version: 1, result: "https://example.com/fresh" }),
-      );
+      await expectStoredResult(storage, "https://example.com/fresh");
     });
 
     it("re-resolves when the flag is set but the blob is absent (flag-without-blob)", async () => {
@@ -692,9 +699,7 @@ describe("resolveAppLaunch", () => {
       // Only the fresh result is cached/armed. Stored form is the versioned
       // JSON envelope introduced by POS-152/POS-162, not a bare string.
       expect(await storage.getItem("Posted_attributionResolved")).toBe("true");
-      expect(await storage.getItem("Posted_attributionResult")).toBe(
-        JSON.stringify({ version: 1, result: "https://example.com/fresh" }),
-      );
+      await expectStoredResult(storage, "https://example.com/fresh");
     });
   });
 });

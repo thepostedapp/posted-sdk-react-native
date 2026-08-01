@@ -547,6 +547,36 @@ describe("resolveAppLaunch", () => {
       expect(calls).toHaveLength(0);
     });
 
+    it("drops a corrupt non-URL blob and re-resolves (POS-262)", async () => {
+      mockLinking.getInitialURL.mockResolvedValue(null);
+      const storage = makeStorage();
+      // A truncated/garbled storage half-write: fails JSON.parse and doesn't
+      // look like a URL, so it can't be a genuine legacy bare-string result.
+      await storage.setItem(FLAG_KEY, "true");
+      await storage.setItem(RESULT_KEY, "{corrupt-blob-not-json-or-a-url");
+
+      const calls = mockFetch({ link: "https://example.com/recovered-from-corruption" });
+      const result = await resolveAppLaunch(makeConfig(storage));
+
+      expect(result).toBe("https://example.com/recovered-from-corruption");
+      expect(calls).toHaveLength(1);
+    });
+
+    it("still tolerates a legacy bare-string URL that fails JSON.parse (POS-262)", async () => {
+      mockLinking.getInitialURL.mockResolvedValue(null);
+      const storage = makeStorage();
+      // Pre-envelope installs stored the raw URL string directly; it must
+      // still be trusted since it looks like a URL.
+      await storage.setItem(FLAG_KEY, "true");
+      await storage.setItem(RESULT_KEY, "posted://legacy/bare-string");
+
+      const calls = mockFetch({});
+      const result = await resolveAppLaunch(makeConfig(storage));
+
+      expect(result).toBe("posted://legacy/bare-string");
+      expect(calls).toHaveLength(0);
+    });
+
     it("does not arm the fire-once flag when persisting the blob fails", async () => {
       mockLinking.getInitialURL.mockResolvedValue(null);
       const storage = makeStorage();

@@ -58,9 +58,15 @@ function decodeCachedResult(raw: string | null): DecodeOutcome {
       return { ok: true, result: typeof value === "string" ? value : null };
     }
   } catch {
-    // Not a JSON envelope — treat as a legacy bare-string result.
+    // Not a JSON envelope — could be a legacy bare-string result (pre-envelope
+    // installs persisted the raw URL directly) or a corrupt/truncated blob
+    // (e.g. a storage half-write). The two are indistinguishable without a
+    // marker, so only trust it as the legacy format when it looks like a URL
+    // (http(s) or a custom app scheme, same check as isWebUrl/usePosted use
+    // for deep links elsewhere in the SDK) — a genuine attribution result is
+    // always a link. Anything else is corrupt: drop + re-resolve. See POS-262.
   }
-  return { ok: true, result: raw };
+  return raw.includes("://") || raw.startsWith("//") ? { ok: true, result: raw } : { ok: false };
 }
 
 // In-memory cache: survives within a single JS runtime; cleared by resetSession().

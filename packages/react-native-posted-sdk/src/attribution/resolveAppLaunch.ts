@@ -197,15 +197,26 @@ async function doResolve(config?: Config): Promise<PostedResult> {
   // Persist fire-once flag + result
   try {
     await writeCache(cfg.storage, result);
-  } catch (error) {
-    // Storage write failed: the fire-once flag was NOT armed. The current result is
-    // still returned (non-fatal), but the next launch will re-resolve and re-fire the
-    // network call — silent cost/attribution drift. Log at debug level so the condition
-    // is diagnosable without adding noise to normal operation.
-    console.debug(
-      "🔗[Posted:STORAGE_WRITE_FAILED] Failed to persist fire-once flag; next launch will re-resolve.",
-      error,
-    );
+  } catch {
+    // Bounded single retry, no backoff delay: at cold launch, storage writes
+    // often contend with other native modules/SDKs initializing on the same
+    // bridge, so an immediate second attempt can succeed where the first
+    // didn't. A real backoff would either delay the returned result or require
+    // a fire-and-forget timer that risks never running if the app backgrounds
+    // or is killed right after launch — so the retry is bounded to one
+    // immediate, awaited attempt. See POS-322.
+    try {
+      await writeCache(cfg.storage, result);
+    } catch (error) {
+      // Storage write failed again: the fire-once flag was NOT armed. The current result is
+      // still returned (non-fatal), but the next launch will re-resolve and re-fire the
+      // network call — silent cost/attribution drift. Log at debug level so the condition
+      // is diagnosable without adding noise to normal operation.
+      console.debug(
+        "🔗[Posted:STORAGE_WRITE_FAILED] Failed to persist fire-once flag after retry; next launch will re-resolve.",
+        error,
+      );
+    }
   }
 
   // Re-check: a reset may have landed during the storage write above.

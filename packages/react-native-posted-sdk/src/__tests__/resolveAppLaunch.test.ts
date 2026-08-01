@@ -299,6 +299,50 @@ describe("resolveAppLaunch", () => {
       debugSpy.mockRestore();
     });
 
+    it("retries once and arms the fire-once flag when the first write attempt fails transiently (POS-322)", async () => {
+      mockLinking.getInitialURL.mockResolvedValue(null);
+      const storage = makeStorage();
+      // Only the very first setItem call fails (simulates transient bridge
+      // contention at cold launch); the retry attempt succeeds.
+      let calls = 0;
+      (storage.setItem as jest.Mock).mockImplementation(async (key: string, value: string) => {
+        calls += 1;
+        if (calls === 1) throw new Error("transient bridge congestion");
+        storage._store[key] = value;
+      });
+      mockFetch({ link: "https://example.com/retried" });
+
+      const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+
+      const result = await resolveAppLaunch(makeConfig(storage));
+      expect(result).toBe("https://example.com/retried");
+
+      // Retry succeeded: flag is armed and nothing was logged.
+      expect(storage._store["Posted_attributionResolved"]).toBe("true");
+      expect(debugSpy).not.toHaveBeenCalled();
+
+      debugSpy.mockRestore();
+    });
+
+    it("logs once (not per attempt) when both the initial write and the retry fail", async () => {
+      mockLinking.getInitialURL.mockResolvedValue(null);
+      const storage = makeStorage();
+      (storage.setItem as jest.Mock).mockRejectedValue(new Error("disk full"));
+      mockFetch({ link: "https://example.com/promo" });
+
+      const debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+
+      const result = await resolveAppLaunch(makeConfig(storage));
+      expect(result).toBe("https://example.com/promo");
+
+      // Both the initial attempt and the retry failed — logged exactly once, after giving up.
+      expect(debugSpy).toHaveBeenCalledTimes(1);
+      const [message] = debugSpy.mock.calls[0]!;
+      expect(message).toContain("after retry");
+
+      debugSpy.mockRestore();
+    });
+
     it("does not log on a successful storage write", async () => {
       mockLinking.getInitialURL.mockResolvedValue(null);
       const storage = makeStorage();

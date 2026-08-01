@@ -1,6 +1,6 @@
 {
   "name": "@posted-sdk/react-native",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "description": "SDK for handling deferred links — posted-sdk React Native package",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",

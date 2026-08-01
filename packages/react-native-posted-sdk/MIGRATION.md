@@ -34,18 +34,18 @@ Replace every import from the old package name:
 ### Full symbol map
 
 | Old (`@swmansion/react-native-detour`) | New (`@posted-sdk/react-native`) |
-|---|---|
-| `DetourProvider` | `PostedProvider` |
-| `useDetourContext` | `usePostedContext` |
-| `DETOUR_LINKING_PREFIX` | `POSTED_LINKING_PREFIX` |
-| `Detour` | `Posted` |
-| `DetourAnalytics` | `PostedAnalytics` |
-| `DetourEventNames` | `PostedEventNames` |
-| `DetourContextType` (type) | `PostedContextType` (type) |
-| `DetourLink` (type) | `PostedLink` (type) |
-| `DetourUrlEvent` (type) | `PostedUrlEvent` (type) |
-| `DetourUrlSubscription` (type) | `PostedUrlSubscription` (type) |
-| `DetourStorage` (type) | `PostedStorage` (type) |
+| -------------------------------------- | -------------------------------- |
+| `DetourProvider`                       | `PostedProvider`                 |
+| `useDetourContext`                     | `usePostedContext`               |
+| `DETOUR_LINKING_PREFIX`                | `POSTED_LINKING_PREFIX`          |
+| `Detour`                               | `Posted`                         |
+| `DetourAnalytics`                      | `PostedAnalytics`                |
+| `DetourEventNames`                     | `PostedEventNames`               |
+| `DetourContextType` (type)             | `PostedContextType` (type)       |
+| `DetourLink` (type)                    | `PostedLink` (type)              |
+| `DetourUrlEvent` (type)                | `PostedUrlEvent` (type)          |
+| `DetourUrlSubscription` (type)         | `PostedUrlSubscription` (type)   |
+| `DetourStorage` (type)                 | `PostedStorage` (type)           |
 
 Unchanged exports: `Config`, `LinkType`.
 
@@ -70,7 +70,9 @@ The custom URL scheme changes from `detour://` to `posted://`.
 ```diff
  <data android:scheme="detour" />
 ```
+
 →
+
 ```xml
  <data android:scheme="posted" />
 ```
@@ -80,7 +82,9 @@ The custom URL scheme changes from `detour://` to `posted://`.
 ```diff
  <string>detour</string>
 ```
+
 →
+
 ```xml
  <string>posted</string>
 ```
@@ -113,11 +117,9 @@ The short-link domain is `posted.link` as of 3.0.0 (it was `godetour.link` in 2.
 
 ## 5. Deprecation shims and removal timeline
 
-`@posted-sdk/react-native` 2.0.0 ships `@deprecated` re-exports for all old `Detour*` names, so your existing code compiles without changes. TypeScript users will see deprecation warnings pointing to the new names.
+`@posted-sdk/react-native` 2.0.0 shipped `@deprecated` re-exports for all old `Detour*` names, so existing code compiled without changes, with deprecation warnings pointing to the new names.
 
-**Removal timeline:** The `Detour*` shims will be removed in **2.1.0**. Migrate before upgrading past 2.0.x.
-
-When the shims are removed, any imports still using the old names will produce a compile error. Use the symbol map in §2 to update them.
+**Removed in 4.0.0.** The `Detour*` shims (and the `expo-router` `createDetourNativeIntentHandler` shim) have been removed — imports still using the old names now produce a compile error. Use the symbol map in §2 to update them.
 
 ---
 
@@ -153,11 +155,11 @@ deprecation warning.
 Replace every call to an old link method with a single `resolveAppLaunch(config)`
 call at app launch:
 
-| Old method (3.0.0 `@deprecated`) | New | Notes |
-|---|---|---|
-| `resolveInitialLink(config)` | `resolveAppLaunch(config)` | Direct 1:1 replacement. |
-| `processLink(config, url?)` | `resolveAppLaunch(config)` | `url` argument is **ignored** — see §8. |
-| `getDeferredLink(config)` | `resolveAppLaunch(config)` | The deferred branch is now selected automatically; no need to call it directly. |
+| Old method (3.0.0 `@deprecated`) | New                        | Notes                                                                                                                |
+| -------------------------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `resolveInitialLink(config)`     | `resolveAppLaunch(config)` | Direct 1:1 replacement.                                                                                              |
+| `processLink(config, url?)`      | `resolveAppLaunch(config)` | `url` argument is **ignored** — see §8.                                                                              |
+| `getDeferredLink(config)`        | `resolveAppLaunch(config)` | The deferred branch is now selected automatically; no need to call it directly.                                      |
 | `resolveShortLink(config, url?)` | `resolveAppLaunch(config)` | `url` argument is **ignored** — see §8. Short-link resolution now happens internally inside the link-present branch. |
 
 ```diff

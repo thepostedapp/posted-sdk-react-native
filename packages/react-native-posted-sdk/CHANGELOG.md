@@ -2,6 +2,29 @@
 
 All notable changes to `@posted-sdk/react-native` are documented here.
 
+## [4.0.0] — Remove deprecated `Detour*` shims
+
+The `@deprecated Detour*` re-exports, type aliases, and the `expo-router`
+`createDetourNativeIntentHandler` shim (introduced in 2.0.0, see MIGRATION.md §5) are
+removed. They have already outlasted their published removal timeline (2.1.0) across
+the entire 3.0.0 cycle. Migrate to the `Posted*` names per the symbol map in
+[MIGRATION.md](./MIGRATION.md) §2 before upgrading past 3.0.x — imports of the old
+names now fail to compile.
+
+### Breaking changes
+
+- Removed from `@posted-sdk/react-native`: `DetourProvider`, `useDetourContext`,
+  `DETOUR_LINKING_PREFIX`, `Detour`, `DetourAnalytics`, `DetourEventNames`, and the
+  `DetourContextType` / `DetourLink` / `DetourUrlEvent` / `DetourUrlSubscription` /
+  `DetourStorage` type aliases.
+- Removed from `@posted-sdk/react-native/expo-router`: `createDetourNativeIntentHandler`
+  and the `DetourNativeIntentArgs` / `DetourNativeIntentHandler` /
+  `DetourNativeIntentOptions` / `DetourNativeIntentResolveConfig` /
+  `DetourNativeIntentResolvedValue` type aliases.
+- Unaffected: the 3.0.0 `resolveInitialLink` / `processLink` / `getDeferredLink` /
+  `resolveShortLink` deprecated aliases are a separate deprecation cycle and remain in
+  place — see MIGRATION.md §9.
+
 ## [3.0.0] — Attribution-first API: `resolveAppLaunch`
 
 3.0.0 replaces the four imperative link-resolution methods with a single
@@ -68,18 +91,18 @@ For a step-by-step upgrade path see [MIGRATION.md](./MIGRATION.md).
 ### Symbol map (old → new)
 
 | Old (`@swmansion/react-native-detour`) | New (`@posted-sdk/react-native`) |
-|---|---|
-| `DetourProvider` | `PostedProvider` |
-| `useDetourContext` | `usePostedContext` |
-| `DETOUR_LINKING_PREFIX` | `POSTED_LINKING_PREFIX` |
-| `Detour` | `Posted` |
-| `DetourAnalytics` | `PostedAnalytics` |
-| `DetourEventNames` | `PostedEventNames` |
-| `DetourContextType` (type) | `PostedContextType` (type) |
-| `DetourLink` (type) | `PostedLink` (type) |
-| `DetourUrlEvent` (type) | `PostedUrlEvent` (type) |
-| `DetourUrlSubscription` (type) | `PostedUrlSubscription` (type) |
-| `DetourStorage` (type) | `PostedStorage` (type) |
+| -------------------------------------- | -------------------------------- |
+| `DetourProvider`                       | `PostedProvider`                 |
+| `useDetourContext`                     | `usePostedContext`               |
+| `DETOUR_LINKING_PREFIX`                | `POSTED_LINKING_PREFIX`          |
+| `Detour`                               | `Posted`                         |
+| `DetourAnalytics`                      | `PostedAnalytics`                |
+| `DetourEventNames`                     | `PostedEventNames`               |
+| `DetourContextType` (type)             | `PostedContextType` (type)       |
+| `DetourLink` (type)                    | `PostedLink` (type)              |
+| `DetourUrlEvent` (type)                | `PostedUrlEvent` (type)          |
+| `DetourUrlSubscription` (type)         | `PostedUrlSubscription` (type)   |
+| `DetourStorage` (type)                 | `PostedStorage` (type)           |
 
 Unchanged exports: `Config`, `LinkType`.
 

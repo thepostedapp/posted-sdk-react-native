@@ -25,9 +25,9 @@ const buildReactNavigationUrl = (route: string, linkType: LinkType) => {
   return `${POSTED_LINKING_PREFIX}${path}${query ? `?${query}` : ""}`;
 };
 
-const emitUrlEvent = (url: string) => {
+const emitUrlEvent = (url: string, link: PostedLink) => {
   for (const listener of listeners) {
-    listener({ url });
+    listener({ url, link });
   }
 };
 
@@ -41,7 +41,21 @@ export const notifyReactNavigationUrl = (link: Exclude<PostedLink, null>) => {
     }
   }
 
-  emitUrlEvent(url);
+  emitUrlEvent(url, link);
+};
+
+/**
+ * Continuous-event parity (POS-503/POS-504): notifies listeners of an incoming URL
+ * that did not resolve to an attributable posted link, mirroring Flutter's nullable
+ * PostedResult.link. Never feeds the getInitialURL() cold-start buffer — only live
+ * listeners (attached after initial processing) receive it.
+ */
+export const notifyReactNavigationUnmatchedUrl = (url: string) => {
+  if (!initialProcessingFinished) {
+    return;
+  }
+
+  emitUrlEvent(url, null);
 };
 
 export const markReactNavigationInitialUrlProcessed = () => {

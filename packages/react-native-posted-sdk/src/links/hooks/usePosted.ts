@@ -9,6 +9,7 @@ import type { LinkType, PostedContextType, PostedLink, RequiredConfig } from "..
 import { checkIsFirstEntrance, markFirstEntrance } from "../utils/appEntrance";
 import {
   markReactNavigationInitialUrlProcessed,
+  notifyReactNavigationUnmatchedUrl,
   notifyReactNavigationUrl,
 } from "../utils/reactNavigation";
 import {
@@ -179,6 +180,8 @@ export const usePosted = ({
       if (resolved) {
         notifyReactNavigationUrl(resolved);
         setLink(resolved);
+      } else {
+        notifyReactNavigationUnmatchedUrl(url);
       }
     });
     return () => subscription.remove();

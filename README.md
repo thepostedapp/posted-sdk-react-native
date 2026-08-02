@@ -424,6 +424,11 @@ export type PostedLink = {
 
 ### React Navigation adapter types
 
+`PostedUrlEvent` carries both the React Navigation Linking mirror `url` (unchanged —
+existing `({ url }) => ...` consumers keep working as-is) and the parsed attribution
+`link`, matching the canonical continuous-event payload contract shared across posted-sdk
+platforms. `link` is `null` when the incoming URL isn't an attributable posted link.
+
 <details>
 <summary>React Navigation adapter types</summary>
 
@@ -431,7 +436,10 @@ export type PostedLink = {
 export const POSTED_LINKING_PREFIX: string; // "posted://"
 
 export type PostedUrlEvent = {
+  /** The React Navigation Linking mirror URL — unchanged for existing consumers. */
   url: string;
+  /** The parsed attribution link (route/pathname/params/type), or null if not attributable. */
+  link: PostedLink;
 };
 
 export type PostedUrlSubscription = {
@@ -442,6 +450,23 @@ export type PostedUrlSubscription = {
 ```ts
 Posted.getInitialURL(): Promise<string | undefined>
 Posted.addEventListener("url", (event: PostedUrlEvent) => void): PostedUrlSubscription
+```
+
+</details>
+
+<details>
+<summary>Reading the parsed link from the "url" event</summary>
+
+```ts
+const subscription = Posted.addEventListener("url", ({ url, link }) => {
+  // `url` still drives the React Navigation Linking mirror as before.
+  listener(url);
+
+  // `link` gives you the parsed attribution data directly, without re-parsing `url`.
+  if (link) {
+    console.log(link.route, link.pathname, link.params, link.type);
+  }
+});
 ```
 
 </details>

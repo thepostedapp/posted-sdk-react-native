@@ -53,7 +53,13 @@ export interface PostedStorage {
 }
 
 export type PostedUrlEvent = {
+  /** The React Navigation Linking mirror URL — unchanged for existing consumers. */
   url: string;
+  /**
+   * The parsed attribution link, matching the canonical continuous-event payload
+   * contract (POS-503). `null` when the incoming URL is not an attributable posted link.
+   */
+  link: PostedLink;
 };
 
 export type PostedUrlSubscription = {

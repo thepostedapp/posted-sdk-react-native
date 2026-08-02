@@ -156,16 +156,18 @@ components:
     ResolveShortResponse:
       type: object
       description: |
-        RN and Android read all three fields; iOS reads only `link`. `route`/`parameters`
-        are therefore optional. RESOLVED (POS-26): `parameters` is ALWAYS a **stringified
-        JSON object** — the backend serializes the params object to a JSON string and the
-        SDK passes it through (never a query-string).
+        No current SDK (RN, Android, iOS) reads `route`/`parameters` — each reconstructs
+        the app route from the resolved `link` URL client-side instead, so only `link` is
+        consumed. `route`/`parameters` are therefore optional and forward-looking.
+        RESOLVED (POS-26): `parameters` is ALWAYS a **stringified JSON object** — the
+        backend serializes the params object to a JSON string and the SDK passes it
+        through (never a query-string).
       properties:
         link: { type: string }
         route: { type: [string, "null"] }
         parameters:
           type: [string, "null"]
-          description: 'Stringified JSON object of route parameters, e.g. ''{"color":"red"}''. Always JSON (never a query-string); null/absent when there are no parameters.'
+          description: 'Stringified JSON object of route parameters, e.g. ''{"color":"red"}''. Always JSON (never a query-string); null/absent when there are no parameters. Not currently consumed by any SDK.'
       required: [link]
 
     UniversalLinkClickRequest:

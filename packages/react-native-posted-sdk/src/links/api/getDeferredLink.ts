@@ -68,33 +68,37 @@ export const getDeferredLink = async ({
     });
   }
 
-  try {
-    if (!response.ok) {
-      if (response.status === 404) {
-        console.warn("🔗[Posted:WARNING] No matching deferred link found");
-        return null;
-      }
-
-      let errorMessage = "Request failed";
-
-      try {
-        const errorBody = await response.json();
-        if (errorBody?.error) {
-          errorMessage =
-            typeof errorBody.error === "string" ? errorBody.error : JSON.stringify(errorBody.error);
-        }
-      } catch {
-        // If the response isn't JSON (e.g., 500 Internal Server Error HTML),
-        // fall back to the generic status code message.
-      }
-
-      throw new Error(`[${response.status}] ${errorMessage}`);
+  if (!response.ok) {
+    if (response.status === 404) {
+      console.warn("🔗[Posted:WARNING] No matching deferred link found");
+      return null;
     }
 
+    let errorMessage = "Request failed";
+
+    try {
+      const errorBody = await response.json();
+      if (errorBody?.error) {
+        errorMessage =
+          typeof errorBody.error === "string" ? errorBody.error : JSON.stringify(errorBody.error);
+      }
+    } catch {
+      // If the response isn't JSON (e.g., 500 Internal Server Error HTML),
+      // fall back to the generic status code message.
+    }
+
+    // Genuine failure (non-404 non-2xx): rethrow so doResolve()'s catch treats
+    // this as a transient error and does NOT arm fire-once. See POS-460/POS-465.
+    throw new Error(`[${response.status}] ${errorMessage}`);
+  }
+
+  try {
     const data = await response.json();
     return data.link || null;
   } catch (error) {
-    console.error("🔗[Posted:NETWORK_ERROR] Error fetching deferred link:", error);
-    return null;
+    // Decode failure on a 2xx body is a genuine failure, not a legitimate empty
+    // match — rethrow so fire-once is NOT armed. See POS-460/POS-465.
+    console.error("🔗[Posted:NETWORK_ERROR] Error decoding deferred link response:", error);
+    throw error;
   }
 };

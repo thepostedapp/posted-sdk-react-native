@@ -53,14 +53,14 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/posted-attribution/posted-sdk-react-native.git"
+    "url": "git+https://github.com/thepostedapp/posted-sdk-react-native.git"
   },
   "author": "postedapp <yuriy@postedapp.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/posted-attribution/posted-sdk-react-native/issues"
+    "url": "https://github.com/thepostedapp/posted-sdk-react-native/issues"
   },
-  "homepage": "https://github.com/posted-attribution/posted-sdk-react-native#readme",
+  "homepage": "https://github.com/thepostedapp/posted-sdk-react-native#readme",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/",

@@ -9,4 +9,13 @@ pnpm --filter @posted-sdk/react-native typecheck
 echo "▶ style (non-blocking)"
 pnpm exec eslint . --cache || echo "::warn:: eslint findings (non-blocking)"
 pnpm exec prettier --check . || echo "::warn:: prettier diffs (non-blocking)"
+# Guard: reject stale references to the old GitHub org (postedapp); correct org is thepostedapp.
+# The search pattern does not appear in thepostedapp URLs so there are no false positives.
+echo "▶ org-url guard: no stale old-org references (BLOCKING)"
+STALE_PATTERN='github\.com/postedapp'
+if MATCHES=$(git grep -n -- "$STALE_PATTERN" -- ':!scripts/static-check.sh'); then
+  echo "✗ stale old-org URL found — update to github.com/thepostedapp:"
+  echo "$MATCHES"
+  exit 1
+fi
 echo "✓ static gate passed"

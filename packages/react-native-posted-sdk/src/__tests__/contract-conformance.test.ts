@@ -2,13 +2,13 @@
  * Wire-format conformance suite — POS-40
  *
  * Validates that every fetch call emitted by the RN SDK matches the
- * detour-backend-contract.yaml schema for URL, method, headers, and body.
+ * posted-backend-contract.yaml schema for URL, method, headers, and body.
  *
  * Mechanism: mock global.fetch, capture calls, validate body with ajv against
  * schemas extracted from the vendored OpenAPI contract.
  *
- * Pinned contract: src/__tests__/__fixtures__/detour-backend-contract.yaml
- * Canonical source: posted-sdk-admin/contract/detour-backend-contract.yaml
+ * Pinned contract: src/__tests__/__fixtures__/posted-backend-contract.yaml
+ * Canonical source: posted-sdk-admin/contract/posted-backend-contract.yaml
  */
 
 import fs from "fs";
@@ -65,7 +65,7 @@ const Ajv = require("ajv");
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const yaml = require("js-yaml");
 
-const contractPath = path.join(__dirname, "__fixtures__", "detour-backend-contract.yaml");
+const contractPath = path.join(__dirname, "__fixtures__", "posted-backend-contract.yaml");
 const contract = yaml.load(fs.readFileSync(contractPath, "utf-8"));
 
 // unknownFormats allows OpenAPI extension formats (int64, int32) to pass through unvalidated

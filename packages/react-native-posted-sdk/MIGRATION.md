@@ -2,7 +2,7 @@
 
 This guide covers upgrading from any `@swmansion/react-native-detour` version to `@posted-sdk/react-native` 2.0.0.
 
-For the canonical cross-platform naming scheme see the [POS-8 plan](https://github.com/posted-attribution/posted-sdk-react-native/issues) (internal board link: `/POS/issues/POS-8#document-plan`).
+For the canonical cross-platform naming scheme see the POS-8 plan (internal board link: `/POS/issues/POS-8#document-plan`).
 
 ---
 

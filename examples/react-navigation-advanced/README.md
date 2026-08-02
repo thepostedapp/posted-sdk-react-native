@@ -88,7 +88,6 @@ Create an organization and add a new app. Posted assigns it a base link URL of t
 
 > **Dashboard**. _Create an organization (top-left), create a new app (top-right), and use the generated link (marked with red) in Link settings (bottom)._
 
-
 ### 2. Configure the platforms
 
 Open **App configuration** and fill in the platform details:
@@ -106,7 +105,6 @@ The dashboard generates the `associatedDomains` and intent-filter snippets to pa
 <br>
 
 > **Dashboard › App configuration**. _iOS and Android filled configurations with generated integration code snippets ready to copy._
-
 
 ### 3. Copy your credentials
 
@@ -215,7 +213,6 @@ For more cases and gotchas, see [Testing & Troubleshooting](https://postedapp.co
 
 ## See also
 
-- [Deferred deep linking blog series](https://swmansion.com/blog/integrating-deferred-deep-linking-in-react-native-apps-1/) — background on the technique
 - [SDK Usage](https://postedapp.com/docs/sdk/react-native/sdk-usage) <!-- TODO(B6): update when new docs URL is live --> — how to integrate Posted with your navigation library
 - [API Reference](https://postedapp.com/docs/sdk/react-native/api-reference) <!-- TODO(B6): update when new docs URL is live --> — full type and method reference
 - [`examples/react-navigation`](../react-navigation) — minimal React Navigation integration

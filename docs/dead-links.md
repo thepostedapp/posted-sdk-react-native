@@ -1,0 +1,59 @@
+# Dead link sweep (POS-524)
+
+Every link in this repo's docs (READMEs, CHANGELOG, MIGRATION, examples, code-comment URLs), external and
+internal/relative, was HTTP-checked. Internal/relative links all resolved (200/exists) and needed no
+changes. Findings for external links below.
+
+## Removed
+
+Links with no existing tracking that were confirmed dead and removed from the referencing doc.
+
+| repo-relative-path                              | dead URL                                                                               | referencing doc                                                  |
+| ----------------------------------------------- | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `examples/react-navigation-advanced/README.md`  | `https://swmansion.com/blog/integrating-deferred-deep-linking-in-react-native-apps-1/` | `examples/react-navigation-advanced/README.md` (POS-524 Part 1a) |
+| `packages/react-native-posted-sdk/MIGRATION.md` | `https://github.com/posted-attribution/posted-sdk-react-native/issues`                 | `packages/react-native-posted-sdk/MIGRATION.md`                  |
+
+## Flagged — not removed, pending board decision
+
+These URLs also 404, but every occurrence already carries an inline `<!-- TODO(Bn): ... -->` marker added
+in the original rebrand commit (`e83777c`, "feat: rebrand Detour → posted-sdk"), tracking a **known**
+pending domain/org change (new docs site, new backend domain, GitHub org rename — not yet live). They are
+not left over from neglect; each is deliberately tracked in-line already. Removing them now would strip
+the primary instructional content (dashboard/setup/testing/architecture links) from every README in this
+repo ahead of that migration landing. Left intact pending a board call on whether to (a) keep as-is
+(current, TODO-tracked), (b) remove now and re-add once the destinations are live, or (c) something else.
+See PR/issue comment for the ask.
+
+| repo-relative-path                             | dead URL                                                                                                                                                  | referencing doc                                                 | existing marker       |
+| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- | --------------------- |
+| `README.md`                                    | `https://postedapp.com/docs/`                                                                                                                             | `README.md:9`                                                   | `TODO(B6)`            |
+| `README.md`                                    | `https://postedapp.com/docs/sdk/react-native/sdk-installation`                                                                                            | `README.md:10`                                                  | `TODO(B6)`            |
+| `README.md`                                    | `https://github.com/posted-sdk/android`                                                                                                                   | `README.md:534`                                                 | `TODO(B7)`            |
+| `README.md`                                    | `https://github.com/posted-sdk/ios`                                                                                                                       | `README.md:535`                                                 | `TODO(B7)`            |
+| `README.md`                                    | `https://github.com/posted-sdk/flutter`                                                                                                                   | `README.md:536`                                                 | `TODO(B7)`            |
+| `examples/expo-bare/README.md`                 | `https://postedapp.com/docs/sdk/react-native/sdk-installation`                                                                                            | `examples/expo-bare/README.md:3`                                | `TODO(B6)`            |
+| `examples/expo-bare/README.md`                 | `https://postedapp.com` (×3)                                                                                                                              | `examples/expo-bare/README.md:31,158`                           | `TODO(B3)`            |
+| `examples/expo-bare/README.md`                 | `https://postedapp.com/docs/Fundamentals/dashboard`                                                                                                       | `examples/expo-bare/README.md:31`                               | `TODO(B6)`            |
+| `examples/expo-bare/README.md`                 | `https://postedapp.com/docs/Fundamentals/getting-started#4-complete-app-configuration`                                                                    | `examples/expo-bare/README.md:37`                               | `TODO(B6)`            |
+| `examples/expo-bare/README.md`                 | `https://postedapp.com/docs/Fundamentals/dashboard#apps`                                                                                                  | `examples/expo-bare/README.md:39`                               | `TODO(B6)`            |
+| `examples/expo-bare/README.md`                 | `https://postedapp.com/docs/sdk/react-native/testing#testing-android-app-links`                                                                           | `examples/expo-bare/README.md:57`                               | `TODO(B6)`            |
+| `examples/expo-bare/README.md`                 | `https://postedapp.com/docs/Fundamentals/getting-started#app-configuration`                                                                               | `examples/expo-bare/README.md:61`                               | `TODO(B6)`            |
+| `examples/expo-bare/README.md`                 | `https://postedapp.com/docs/Fundamentals/dashboard#app-configuration` (×2)                                                                                | `examples/expo-bare/README.md:63,83`                            | `TODO(B6)`            |
+| `examples/expo-bare/README.md`                 | `https://postedapp.com/docs/Fundamentals/dashboard#api-configuration-and-key-security` (×2)                                                               | `examples/expo-bare/README.md:74,159`                           | `TODO(B6)`            |
+| `examples/expo-bare/README.md`                 | `https://postedapp.com/docs/Architecture/architecture-limitations`                                                                                        | `examples/expo-bare/README.md:117`                              | `TODO(B6)`            |
+| `examples/expo-bare/README.md`                 | `https://postedapp.com/docs/sdk/react-native/testing`                                                                                                     | `examples/expo-bare/README.md:153`                              | `TODO(B6)`            |
+| `examples/expo-bare/README.md`                 | `https://postedapp.com/docs/sdk/react-native/sdk-usage`                                                                                                   | `examples/expo-bare/README.md:166`                              | `TODO(B6)`            |
+| `examples/expo-bare/README.md`                 | `https://postedapp.com/docs/sdk/react-native/api-reference`                                                                                               | `examples/expo-bare/README.md:167`                              | `TODO(B6)`            |
+| `examples/expo-router/README.md`               | same `postedapp.com`/`postedapp.com/docs/*` pattern as above                                                                                              | `examples/expo-router/README.md` (13 occurrences)               | `TODO(B3)`/`TODO(B6)` |
+| `examples/expo-router-advanced/README.md`      | same `postedapp.com`/`postedapp.com/docs/*` pattern as above, plus `.../docs/Architecture/matching`                                                       | `examples/expo-router-advanced/README.md` (13 occurrences)      | `TODO(B3)`/`TODO(B6)` |
+| `examples/expo-router-native-intent/README.md` | same `postedapp.com`/`postedapp.com/docs/*` pattern as above, plus `.../api-reference#expo-router-helper` and `.../dashboard#links-behavior-runtime-flow` | `examples/expo-router-native-intent/README.md` (14 occurrences) | `TODO(B3)`/`TODO(B6)` |
+| `examples/react-navigation/README.md`          | same `postedapp.com`/`postedapp.com/docs/*` pattern as above                                                                                              | `examples/react-navigation/README.md` (13 occurrences)          | `TODO(B3)`/`TODO(B6)` |
+| `examples/react-navigation-advanced/README.md` | same `postedapp.com`/`postedapp.com/docs/*` pattern as above, plus `.../docs/Architecture/matching`                                                       | `examples/react-navigation-advanced/README.md` (14 occurrences) | `TODO(B3)`/`TODO(B6)` |
+
+## Checked, alive (no action)
+
+All other external links (github.com/release-it, eslint.org, prettier.io, jestjs.io, typescriptlang.org,
+nodejs.org, pnpm.io, reactnavigation.org, reactnative.dev, docs.expo.dev, developer.apple.com,
+contributor-covenant.org, conventionalcommits.org, app.egghead.io, github.com/mozilla/diversity, bare
+`https://postedapp.com` root) returned 200. All internal/relative markdown links (`./MIGRATION.md`,
+`../react-navigation`, `./LICENSE`, etc.) resolve to existing files.

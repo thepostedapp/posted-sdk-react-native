@@ -135,26 +135,30 @@ describe("Deprecated 3.0.0 shims", () => {
 
     it("resolveInitialLink emits a deprecation warning", async () => {
       await SDK.resolveInitialLink(makeConfig(makeStorage()));
-      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("resolveInitialLink"));
-      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("DEPRECATED"));
+      expect(warnSpy).toHaveBeenCalledWith(
+        "[Posted] resolveInitialLink() is deprecated and will be removed in 4.0.0. Use resolveAppLaunch() instead.",
+      );
     });
 
     it("processLink emits a deprecation warning", async () => {
       await SDK.processLink(makeConfig(makeStorage()));
-      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("processLink"));
-      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("DEPRECATED"));
+      expect(warnSpy).toHaveBeenCalledWith(
+        "[Posted] processLink() is deprecated and will be removed in 4.0.0. Use resolveAppLaunch() instead.",
+      );
     });
 
     it("getDeferredLink emits a deprecation warning", async () => {
       await SDK.getDeferredLink(makeConfig(makeStorage()));
-      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("getDeferredLink"));
-      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("DEPRECATED"));
+      expect(warnSpy).toHaveBeenCalledWith(
+        "[Posted] getDeferredLink() is deprecated and will be removed in 4.0.0. Use resolveAppLaunch() instead.",
+      );
     });
 
     it("resolveShortLink emits a deprecation warning", async () => {
       await SDK.resolveShortLink(makeConfig(makeStorage()));
-      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("resolveShortLink"));
-      expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("DEPRECATED"));
+      expect(warnSpy).toHaveBeenCalledWith(
+        "[Posted] resolveShortLink() is deprecated and will be removed in 4.0.0. Use resolveAppLaunch() instead.",
+      );
     });
   });
 

@@ -4,7 +4,7 @@ export { POSTED_LINKING_PREFIX, Posted } from "./reactNavigation";
 export { configure } from "./attribution/configure";
 export { resolveAppLaunch, resetSession } from "./attribution/resolveAppLaunch";
 
-// @deprecated Use resolveAppLaunch() instead. Will be removed in a future major version.
+// @deprecated Use resolveAppLaunch() instead. Will be removed in 4.0.0.
 export {
   resolveInitialLink,
   processLink,

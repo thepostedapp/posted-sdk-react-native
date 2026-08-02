@@ -1,3 +1,10 @@
+// ---- Imports ----
+import { Linking } from "react-native";
+
+import { clearGlobalConfig } from "../attribution/configure";
+import { resetSession, resolveAppLaunch } from "../attribution/resolveAppLaunch";
+import type { PostedStorage } from "../links/types";
+
 /**
  * resolveAppLaunch facade — POS-129
  *
@@ -52,13 +59,6 @@ jest.mock("react-native", () => ({
   PixelRatio: { get: jest.fn().mockReturnValue(3) },
 }));
 
-// ---- Imports ----
-
-import { Linking } from "react-native";
-import { resolveAppLaunch, resetSession } from "../attribution/resolveAppLaunch";
-import { clearGlobalConfig } from "../attribution/configure";
-import type { PostedStorage } from "../links/types";
-
 // ---- Helpers ----
 
 const API_KEY = "test-api-key";
@@ -103,7 +103,11 @@ type FetchCall = { url: string; method: string; body: unknown };
 function mockFetch(responseBody: object, status = 200): FetchCall[] {
   const calls: FetchCall[] = [];
   global.fetch = jest.fn().mockImplementation(async (url: string, opts: RequestInit = {}) => {
-    calls.push({ url, method: opts.method ?? "GET", body: opts.body ? JSON.parse(opts.body as string) : undefined });
+    calls.push({
+      url,
+      method: opts.method ?? "GET",
+      body: opts.body ? JSON.parse(opts.body as string) : undefined,
+    });
     return { ok: status >= 200 && status < 300, status, json: () => Promise.resolve(responseBody) };
   }) as jest.Mock;
   return calls;
@@ -163,7 +167,9 @@ describe("resolveAppLaunch", () => {
       const result = await resolveAppLaunch(makeConfig(storage));
 
       expect(result).toBe(launchUrl);
-      const clickCall = calls.find((c) => c.url === "https://api.posted.app/api/link/universal-link-click");
+      const clickCall = calls.find(
+        (c) => c.url === "https://api.posted.app/api/link/universal-link-click",
+      );
       expect(clickCall).toBeDefined();
       // match-link must NOT be called for link-present launches
       const matchCall = calls.find((c) => c.url === "https://api.posted.app/api/link/match-link");
@@ -182,7 +188,9 @@ describe("resolveAppLaunch", () => {
       const result = await resolveAppLaunch(makeConfig(storage));
 
       expect(result).toBe(fullLink);
-      const resolveCall = calls.find((c) => c.url === "https://api.posted.app/api/link/resolve-short");
+      const resolveCall = calls.find(
+        (c) => c.url === "https://api.posted.app/api/link/resolve-short",
+      );
       expect(resolveCall).toBeDefined();
       expect(resolveCall!.body).toEqual({ url: shortUrl });
     });
@@ -197,7 +205,9 @@ describe("resolveAppLaunch", () => {
       const result = await resolveAppLaunch(makeConfig(storage));
 
       expect(result).toBe(shortUrl);
-      expect(calls.some((c) => c.url === "https://api.posted.app/api/link/resolve-short")).toBe(true);
+      expect(calls.some((c) => c.url === "https://api.posted.app/api/link/resolve-short")).toBe(
+        true,
+      );
     });
 
     it("ignores infrastructure URLs and falls through to deferred branch", async () => {
@@ -209,7 +219,9 @@ describe("resolveAppLaunch", () => {
 
       // Only match-link should be called (deferred), NOT universal-link-click
       expect(calls.some((c) => c.url === "https://api.posted.app/api/link/match-link")).toBe(true);
-      expect(calls.some((c) => c.url === "https://api.posted.app/api/link/universal-link-click")).toBe(false);
+      expect(
+        calls.some((c) => c.url === "https://api.posted.app/api/link/universal-link-click"),
+      ).toBe(false);
     });
   });
 
@@ -418,6 +430,79 @@ describe("resolveAppLaunch", () => {
 
       expect(second).toBe("https://example.com/retry");
       expect(secondCalls).toHaveLength(1);
+    });
+
+    it("a non-2xx, non-404 response (500) does not persist fire-once — next launch retries", async () => {
+      mockLinking.getInitialURL.mockResolvedValue(null);
+      const storage = makeStorage();
+
+      // First call: server error
+      mockFetch({ error: "boom" }, 500);
+      const first = await resolveAppLaunch(makeConfig(storage));
+
+      expect(first).toBeNull();
+      // Fire-once flag must NOT be armed after a genuine server failure
+      expect(await storage.getItem("Posted_attributionResolved")).toBeNull();
+
+      // Second call: server recovers → must retry (not short-circuit to null)
+      const secondCalls = mockFetch({ link: "https://example.com/retry-500" });
+      const second = await resolveAppLaunch(makeConfig(storage));
+
+      expect(second).toBe("https://example.com/retry-500");
+      expect(secondCalls).toHaveLength(1);
+    });
+
+    it("a JSON decode failure on a 2xx body does not persist fire-once — next launch retries", async () => {
+      mockLinking.getInitialURL.mockResolvedValue(null);
+      const storage = makeStorage();
+
+      // First call: 2xx response whose body isn't valid JSON
+      global.fetch = jest.fn().mockResolvedValue({
+        ok: true,
+        status: 200,
+        json: () => Promise.reject(new SyntaxError("Unexpected token")),
+      }) as jest.Mock;
+      const first = await resolveAppLaunch(makeConfig(storage));
+
+      expect(first).toBeNull();
+      // Fire-once flag must NOT be armed after a decode failure
+      expect(await storage.getItem("Posted_attributionResolved")).toBeNull();
+
+      // Second call: body decodes fine → must retry (not short-circuit to null)
+      const secondCalls = mockFetch({ link: "https://example.com/retry-decode" });
+      const second = await resolveAppLaunch(makeConfig(storage));
+
+      expect(second).toBe("https://example.com/retry-decode");
+      expect(secondCalls).toHaveLength(1);
+    });
+
+    it("a legitimate 404 (no matching link) DOES persist fire-once", async () => {
+      mockLinking.getInitialURL.mockResolvedValue(null);
+      const storage = makeStorage();
+
+      mockFetch({ error: "not found" }, 404);
+      const first = await resolveAppLaunch(makeConfig(storage));
+
+      expect(first).toBeNull();
+      expect(await storage.getItem("Posted_attributionResolved")).toBe("true");
+
+      // Second call must short-circuit to the cached null — no further network calls
+      const secondCalls = mockFetch({ link: "https://example.com/should-not-be-called" });
+      const second = await resolveAppLaunch(makeConfig(storage));
+
+      expect(second).toBeNull();
+      expect(secondCalls).toHaveLength(0);
+    });
+
+    it("a successful resolution DOES persist fire-once", async () => {
+      mockLinking.getInitialURL.mockResolvedValue(null);
+      const storage = makeStorage();
+
+      mockFetch({ link: "https://example.com/armed" });
+      const first = await resolveAppLaunch(makeConfig(storage));
+
+      expect(first).toBe("https://example.com/armed");
+      expect(await storage.getItem("Posted_attributionResolved")).toBe("true");
     });
   });
 
@@ -761,7 +846,10 @@ describe("resolveAppLaunch", () => {
       // removeItem calls: the flag (removed first) is gone, but the result blob
       // (removed second) never got cleared.
       await storage.setItem(FLAG_KEY, "true");
-      await storage.setItem(RESULT_KEY, storedEnvelope("https://example.com/stale-after-torn-clear"));
+      await storage.setItem(
+        RESULT_KEY,
+        storedEnvelope("https://example.com/stale-after-torn-clear"),
+      );
       await storage.removeItem!(FLAG_KEY);
 
       const calls = mockFetch({ link: "https://example.com/after-torn-clear" });

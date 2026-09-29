@@ -8,10 +8,22 @@ changes. Findings for external links below.
 
 Links with no existing tracking that were confirmed dead and removed from the referencing doc.
 
-| repo-relative-path                              | dead URL                                                                               | referencing doc                                                  |
-| ----------------------------------------------- | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| `examples/react-navigation-advanced/README.md`  | `https://swmansion.com/blog/integrating-deferred-deep-linking-in-react-native-apps-1/` | `examples/react-navigation-advanced/README.md` (POS-524 Part 1a) |
-| `packages/react-native-posted-sdk/MIGRATION.md` | `https://github.com/posted-attribution/posted-sdk-react-native/issues`                 | `packages/react-native-posted-sdk/MIGRATION.md`                  |
+| repo-relative-path                              | dead URL                                                                                                                                                          | referencing doc                                                  |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `examples/react-navigation-advanced/README.md`  | `https://swmansion.com/blog/integrating-deferred-deep-linking-in-react-native-apps-1/`                                                                            | `examples/react-navigation-advanced/README.md` (POS-524 Part 1a) |
+| `packages/react-native-posted-sdk/MIGRATION.md` | `https://github.com/thepostedapp/posted-sdk-react-native/issues` (org at time of sweep was the pre-rename org; renamed to `thepostedapp` 2026-09-29, see POS-548) | `packages/react-native-posted-sdk/MIGRATION.md`                  |
+
+## Resolved — GitHub org rename (POS-548, 2026-09-29)
+
+These rows previously carried an inline marker tracking a pending GitHub org rename (placeholder
+org for the cross-platform SDK links). The board completed the rename to `thepostedapp` on
+2026-09-29; links updated in place and the markers removed.
+
+| repo-relative-path | new URL                                              | referencing doc |
+| ------------------ | ---------------------------------------------------- | --------------- |
+| `README.md`        | `https://github.com/thepostedapp/posted-sdk-android` | `README.md:534` |
+| `README.md`        | `https://github.com/thepostedapp/posted-sdk-ios`     | `README.md:535` |
+| `README.md`        | `https://github.com/thepostedapp/posted-sdk-flutter` | `README.md:536` |
 
 ## Flagged — not removed, pending board decision
 
@@ -28,9 +40,6 @@ See PR/issue comment for the ask.
 | ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- | --------------------- |
 | `README.md`                                    | `https://postedapp.com/docs/`                                                                                                                             | `README.md:9`                                                   | `TODO(B6)`            |
 | `README.md`                                    | `https://postedapp.com/docs/sdk/react-native/sdk-installation`                                                                                            | `README.md:10`                                                  | `TODO(B6)`            |
-| `README.md`                                    | `https://github.com/posted-sdk/android`                                                                                                                   | `README.md:534`                                                 | `TODO(B7)`            |
-| `README.md`                                    | `https://github.com/posted-sdk/ios`                                                                                                                       | `README.md:535`                                                 | `TODO(B7)`            |
-| `README.md`                                    | `https://github.com/posted-sdk/flutter`                                                                                                                   | `README.md:536`                                                 | `TODO(B7)`            |
 | `examples/expo-bare/README.md`                 | `https://postedapp.com/docs/sdk/react-native/sdk-installation`                                                                                            | `examples/expo-bare/README.md:3`                                | `TODO(B6)`            |
 | `examples/expo-bare/README.md`                 | `https://postedapp.com` (×3)                                                                                                                              | `examples/expo-bare/README.md:31,158`                           | `TODO(B3)`            |
 | `examples/expo-bare/README.md`                 | `https://postedapp.com/docs/Fundamentals/dashboard`                                                                                                       | `examples/expo-bare/README.md:31`                               | `TODO(B6)`            |

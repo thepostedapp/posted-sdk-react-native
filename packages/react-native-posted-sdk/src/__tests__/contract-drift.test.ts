@@ -51,7 +51,7 @@ describe("contract drift guard", () => {
     const foreign = [
       ...new Set(
         [...text.matchAll(/https?:\/\/([A-Za-z0-9._-]+)/g)]
-          .map((m) => m[1])
+          .flatMap((m) => (m[1] ? [m[1]] : []))
           .filter((h) => h !== "postedapp.com" && !h.endsWith(".postedapp.com")),
       ),
     ];

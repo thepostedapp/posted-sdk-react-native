@@ -8,15 +8,15 @@ changes. Findings for external links below.
 
 Links with no existing tracking that were confirmed dead and removed from the referencing doc.
 
-| repo-relative-path                              | dead URL                                                                               | referencing doc                                                  |
-| ----------------------------------------------- | -------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| `examples/react-navigation-advanced/README.md`  | `https://swmansion.com/blog/integrating-deferred-deep-linking-in-react-native-apps-1/` | `examples/react-navigation-advanced/README.md` (POS-524 Part 1a) |
-| `packages/react-native-posted-sdk/MIGRATION.md` | `https://github.com/posted-attribution/posted-sdk-react-native/issues`                 | `packages/react-native-posted-sdk/MIGRATION.md`                  |
+| repo-relative-path                              | dead URL                                                                      | referencing doc                                                  |
+| ----------------------------------------------- | ----------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `examples/react-navigation-advanced/README.md`  | prior SDK vendor's blog post on deferred deep linking (URL redacted, POS-541) | `examples/react-navigation-advanced/README.md` (POS-524 Part 1a) |
+| `packages/react-native-posted-sdk/MIGRATION.md` | `https://github.com/posted-attribution/posted-sdk-react-native/issues`        | `packages/react-native-posted-sdk/MIGRATION.md`                  |
 
 ## Flagged — not removed, pending board decision
 
 These URLs also 404, but every occurrence already carries an inline `<!-- TODO(Bn): ... -->` marker added
-in the original rebrand commit (`e83777c`, "feat: rebrand Detour → posted-sdk"), tracking a **known**
+in the original SDK rebrand commit (`e83777c`), tracking a **known**
 pending domain/org change (new docs site, new backend domain, GitHub org rename — not yet live). They are
 not left over from neglect; each is deliberately tracked in-line already. Removing them now would strip
 the primary instructional content (dashboard/setup/testing/architecture links) from every README in this

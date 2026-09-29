@@ -486,46 +486,21 @@ The stream is an idiomatic convenience exposed **only on the JS/Dart wrappers**,
 
 **Fire-once vs continuous** — `resolveAppLaunch` fires once per install and returns the attribution result; the continuous stream never participates in attribution and fires on every warm link.
 
-## Migrating from `@swmansion/react-native-detour`
+## Deprecated link methods → `resolveAppLaunch`
 
-The package has been renamed. Update your imports:
-
-| Old (`@swmansion/react-native-detour`) | New (`@posted-sdk/react-native`)  |
-| -------------------------------------- | --------------------------------- |
-| `DetourProvider`                       | `PostedProvider`                  |
-| `useDetourContext`                     | `usePostedContext`                |
-| `Detour`                               | `Posted`                          |
-| `DETOUR_LINKING_PREFIX`                | `POSTED_LINKING_PREFIX`           |
-| `DetourAnalytics`                      | `PostedAnalytics`                 |
-| `DetourEventNames`                     | `PostedEventNames`                |
-| `DetourContextType`                    | `PostedContextType`               |
-| `DetourLink`                           | `PostedLink`                      |
-| `DetourStorage`                        | `PostedStorage`                   |
-| `createDetourNativeIntentHandler`      | `createPostedNativeIntentHandler` |
-
-The old names were exported as deprecated re-exports from `2.0.0` to ease migration; they
-were removed in `4.0.0`. See [`MIGRATION.md`](./packages/react-native-posted-sdk/MIGRATION.md) §5.
-
-### 3.0.0 — link methods → `resolveAppLaunch`
-
-3.0.0 consolidates the imperative link-resolution methods into a single attribution-first
+The imperative link-resolution methods are consolidated into a single attribution-first
 call. `resolveInitialLink` / `processLink` / `getDeferredLink` / `resolveShortLink` are
-now `@deprecated` aliases that forward to `resolveAppLaunch(config)`. The `url?` argument
+`@deprecated` aliases that forward to `resolveAppLaunch(config)`. The `url?` argument
 on `processLink` / `resolveShortLink` is **ignored** — the facade detects the launch URL
 internally via `Linking.getInitialURL()` and there is no explicit-URL override on React
 Native.
 
-Excerpt of the method mapping (canonical table: [`MIGRATION.md`](./packages/react-native-posted-sdk/MIGRATION.md) §7):
-
-| Old method (3.0.0 `@deprecated`) | New                        |
+| Deprecated method                | Use instead                |
 | -------------------------------- | -------------------------- |
 | `resolveInitialLink(config)`     | `resolveAppLaunch(config)` |
 | `processLink(config, url?)`      | `resolveAppLaunch(config)` |
 | `getDeferredLink(config)`        | `resolveAppLaunch(config)` |
 | `resolveShortLink(config, url?)` | `resolveAppLaunch(config)` |
-
-See [`MIGRATION.md`](./packages/react-native-posted-sdk/MIGRATION.md) §7–§9 for the full
-mapping (with per-method notes), the `url?` behavior change, and the removal timeline.
 
 ## Other posted-sdk SDKs
 

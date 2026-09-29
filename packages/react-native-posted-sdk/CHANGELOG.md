@@ -2,9 +2,10 @@
 
 All notable changes to `@posted-sdk/react-native` are documented here.
 
-## [1.0.0] — Initial public release
+## [4.0.0] — Initial public release
 
-Initial public release of `@posted-sdk/react-native`.
+Initial public release of `@posted-sdk/react-native` (version aligned to the
+unified cross-platform `4.0.0` release train; tracks `package.json`).
 
 ### Public API
 

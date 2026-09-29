@@ -37,7 +37,7 @@ describe("PostedUrlEvent — link parity", () => {
     const { events, subscription } = captureEvents();
 
     const link: Exclude<PostedLink, null> = {
-      url: "https://posted.link/details/42?campaign=summer",
+      url: "https://l.postedapp.com/details/42?campaign=summer",
       route: "/details/42?campaign=summer",
       pathname: "/details/42",
       params: { campaign: "summer" },

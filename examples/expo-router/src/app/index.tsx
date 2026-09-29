@@ -33,14 +33,18 @@ export default function HomeScreen() {
             Uninstall the app or clear its data, open a Posted link in the mobile browser, then
             install and launch — the SDK resolves the link automatically.
           </Text>
-          <Text style={styles.code}>https://&lt;your-org&gt;.posted.link/&lt;hash&gt;/details</Text>
+          <Text style={styles.code}>
+            https://&lt;your-org&gt;.l.postedapp.com/&lt;hash&gt;/details
+          </Text>
 
           <Text style={styles.sectionHeader}>Universal / App Link</Text>
           <Text style={styles.bullet}>
             Open in browser or paste into Notes/Messages and tap — iOS/Android will launch the app
             and Posted navigates to the target route.
           </Text>
-          <Text style={styles.code}>https://&lt;your-org&gt;.posted.link/&lt;hash&gt;/details</Text>
+          <Text style={styles.code}>
+            https://&lt;your-org&gt;.l.postedapp.com/&lt;hash&gt;/details
+          </Text>
 
           <View style={styles.divider} />
 

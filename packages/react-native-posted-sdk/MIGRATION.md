@@ -102,10 +102,10 @@ The linking prefix constant now reflects the new scheme:
 
 ## 4. Update associated domains / short-link domain
 
-The short-link domain is `posted.link` as of 3.0.0 (it was `godetour.link` in 2.0.0). Update your `app.json` associated domains:
+The short-link domain is `l.postedapp.com` as of 3.0.0 (it was `godetour.link` in 2.0.0). Update your `app.json` associated domains:
 
 ```json
-"associatedDomains": ["applinks:<your-org>.posted.link"]
+"associatedDomains": ["applinks:<your-org>.l.postedapp.com"]
 ```
 
 > **Universal Links are optional for v1.** Attribution (probabilistic + deterministic:

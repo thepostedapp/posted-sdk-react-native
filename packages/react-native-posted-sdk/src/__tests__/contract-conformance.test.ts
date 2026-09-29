@@ -171,7 +171,7 @@ describe("RN SDK → backend contract conformance", () => {
       expect(calls).toHaveLength(1);
       const { url, method, headers, body } = calls[0]!;
 
-      expect(url).toBe("https://api.posted.app/api/link/match-link");
+      expect(url).toBe("https://attr.postedapp.com/api/link/match-link");
       expect(method).toBe("POST");
       assertCommonHeaders(headers);
 
@@ -196,7 +196,7 @@ describe("RN SDK → backend contract conformance", () => {
       expect(calls).toHaveLength(1);
       const { url, method, headers, body } = calls[0]!;
 
-      expect(url).toBe("https://api.posted.app/api/link/match-link");
+      expect(url).toBe("https://attr.postedapp.com/api/link/match-link");
       expect(method).toBe("POST");
       assertCommonHeaders(headers);
 
@@ -223,15 +223,15 @@ describe("RN SDK → backend contract conformance", () => {
   // -----------------------------------------------------------------------
   describe("resolve-short", () => {
     it("sends {url} body and correct headers; body conforms to ResolveShortRequest schema", async () => {
-      const calls = mockFetch({ link: "https://posted.link/app/promo" });
-      const shortUrl = "https://posted.link/x9Az";
+      const calls = mockFetch({ link: "https://l.postedapp.com/app/promo" });
+      const shortUrl = "https://l.postedapp.com/x9Az";
 
       await resolveShortLink({ apiKey: API_KEY, appID: APP_ID, url: shortUrl });
 
       expect(calls).toHaveLength(1);
       const { url, method, headers, body } = calls[0]!;
 
-      expect(url).toBe("https://api.posted.app/api/link/resolve-short");
+      expect(url).toBe("https://attr.postedapp.com/api/link/resolve-short");
       expect(method).toBe("POST");
       assertCommonHeaders(headers);
 
@@ -246,14 +246,14 @@ describe("RN SDK → backend contract conformance", () => {
   describe("universal-link-click (no query params)", () => {
     it("omits params when URL has no query string; body conforms to UniversalLinkClickRequest schema", async () => {
       const calls = mockFetch({ allowed: true, clickId: "clk_001" });
-      const clickUrl = "https://posted.link/u/launch";
+      const clickUrl = "https://l.postedapp.com/u/launch";
 
       await sendUniversalLinkClick({ apiKey: API_KEY, appID: APP_ID, url: clickUrl });
 
       expect(calls).toHaveLength(1);
       const { url, method, headers, body } = calls[0]!;
 
-      expect(url).toBe("https://api.posted.app/api/link/universal-link-click");
+      expect(url).toBe("https://attr.postedapp.com/api/link/universal-link-click");
       expect(method).toBe("POST");
       assertCommonHeaders(headers);
 
@@ -279,7 +279,7 @@ describe("RN SDK → backend contract conformance", () => {
   describe("universal-link-click (with query params)", () => {
     it("includes params when URL has a query string; body conforms to UniversalLinkClickRequest schema", async () => {
       const calls = mockFetch({ allowed: true, clickId: "clk_002" });
-      const clickUrl = "https://posted.link/u/launch?campaign=spring&variant=b";
+      const clickUrl = "https://l.postedapp.com/u/launch?campaign=spring&variant=b";
 
       await sendUniversalLinkClick({ apiKey: API_KEY, appID: APP_ID, url: clickUrl });
 
@@ -314,7 +314,7 @@ describe("RN SDK → backend contract conformance", () => {
       expect(calls).toHaveLength(1);
       const { url, method, headers, body } = calls[0]!;
 
-      expect(url).toBe("https://api.posted.app/api/analytics/event");
+      expect(url).toBe("https://attr.postedapp.com/api/analytics/event");
       expect(method).toBe("POST");
       assertCommonHeaders(headers);
 
@@ -371,7 +371,7 @@ describe("RN SDK → backend contract conformance", () => {
       expect(calls).toHaveLength(1);
       const { url, method, headers, body } = calls[0]!;
 
-      expect(url).toBe("https://api.posted.app/api/analytics/retention");
+      expect(url).toBe("https://attr.postedapp.com/api/analytics/retention");
       expect(method).toBe("POST");
       assertCommonHeaders(headers);
 
@@ -435,7 +435,7 @@ describe("RN SDK → backend contract conformance", () => {
       expect(calls).toHaveLength(1);
       const { url, method, headers, body } = calls[0]!;
 
-      expect(url).toBe("https://api.posted.app/api/link/match-link");
+      expect(url).toBe("https://attr.postedapp.com/api/link/match-link");
       expect(method).toBe("POST");
       assertCommonHeaders(headers);
 
@@ -458,7 +458,7 @@ describe("RN SDK → backend contract conformance", () => {
       expect(calls).toHaveLength(1);
       const { url, method, headers, body } = calls[0]!;
 
-      expect(url).toBe("https://api.posted.app/api/link/match-link");
+      expect(url).toBe("https://attr.postedapp.com/api/link/match-link");
       expect(method).toBe("POST");
       assertCommonHeaders(headers);
 

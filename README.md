@@ -510,6 +510,3 @@ posted-sdk is also available for other app stacks:
 
 ---
 
-## License
-
-This library is licensed under [The MIT License](./LICENSE).

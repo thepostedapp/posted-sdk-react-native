@@ -13,7 +13,7 @@ info:
     with every shape they parse.
 
     ## Conventions
-    - All endpoints are `POST`, `application/json`, over HTTPS to `https://godetour.dev`.
+    - All endpoints are `POST`, `application/json`, over HTTPS to `https://attr.postedapp.com`.
     - No compression, no HMAC/request signing, no idempotency keys, no client retries.
     - Two timestamp conventions (intentional, see schemas): **epoch milliseconds** on the
       link endpoints, **ISO-8601 UTC** (`yyyy-MM-dd'T'HH:mm:ss.SSS'Z'`) on analytics.
@@ -42,7 +42,7 @@ info:
       POS-33; values below are not yet authoritative.
 
 servers:
-  - url: https://godetour.dev
+  - url: https://attr.postedapp.com
     description: Production (hardcoded in every SDK; not configurable)
 
 security:
@@ -156,18 +156,16 @@ components:
     ResolveShortResponse:
       type: object
       description: |
-        No current SDK (RN, Android, iOS) reads `route`/`parameters` — each reconstructs
-        the app route from the resolved `link` URL client-side instead, so only `link` is
-        consumed. `route`/`parameters` are therefore optional and forward-looking.
-        RESOLVED (POS-26): `parameters` is ALWAYS a **stringified JSON object** — the
-        backend serializes the params object to a JSON string and the SDK passes it
-        through (never a query-string).
+        RN and Android read all three fields; iOS reads only `link`. `route`/`parameters`
+        are therefore optional. RESOLVED (POS-26): `parameters` is ALWAYS a **stringified
+        JSON object** — the backend serializes the params object to a JSON string and the
+        SDK passes it through (never a query-string).
       properties:
         link: { type: string }
         route: { type: [string, "null"] }
         parameters:
           type: [string, "null"]
-          description: 'Stringified JSON object of route parameters, e.g. ''{"color":"red"}''. Always JSON (never a query-string); null/absent when there are no parameters. Not currently consumed by any SDK.'
+          description: 'Stringified JSON object of route parameters, e.g. ''{"color":"red"}''. Always JSON (never a query-string); null/absent when there are no parameters.'
       required: [link]
 
     UniversalLinkClickRequest:
@@ -314,7 +312,7 @@ paths:
               examples:
                 matched:
                   value:
-                    link: "https://godetour.dev/app/promo?ref=spring"
+                    link: "https://l.postedapp.com/app/promo?ref=spring"
                     clickId: "abc123-click-789"
                     expiresAt: "2026-07-23T18:00:00.000Z"
                 noMatch:
@@ -344,7 +342,7 @@ paths:
             examples:
               shortLink:
                 value:
-                  url: "https://godetour.dev/x9Az"
+                  url: "https://l.postedapp.com/x9Az"
       responses:
         '200':
           description: Resolved link. Returning the input URL unchanged is treated as a loop and ignored.
@@ -354,12 +352,12 @@ paths:
               examples:
                 resolved:
                   value:
-                    link: "https://godetour.dev/app/product/42"
+                    link: "https://l.postedapp.com/app/product/42"
                     route: "/product/42"
                     parameters: '{"color":"red"}'
                 linkOnly:
                   value:
-                    link: "https://godetour.dev/app/product/42"
+                    link: "https://l.postedapp.com/app/product/42"
         '404':
           description: Short link not found — SDK falls back to the raw URL.
         default:
@@ -384,7 +382,7 @@ paths:
               click:
                 summary: iOS click with query params and metadata.
                 value:
-                  url: "https://godetour.dev/u/launch?campaign=spring&variant=b"
+                  url: "https://l.postedapp.com/u/launch?campaign=spring&variant=b"
                   timestamp: 1719158400000
                   platform: ios
                   link_id: "lnk_5567"
@@ -398,7 +396,7 @@ paths:
               clickMinimal:
                 summary: Android minimal click (optional fields omitted entirely).
                 value:
-                  url: "https://godetour.dev/u/launch"
+                  url: "https://l.postedapp.com/u/launch"
                   timestamp: 1719158400000
                   platform: android
       responses:

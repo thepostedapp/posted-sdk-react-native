@@ -139,7 +139,7 @@ describe("resolveAppLaunch", () => {
 
       expect(result).toBe("https://example.com/promo");
       expect(calls).toHaveLength(1);
-      expect(calls[0]!.url).toBe("https://api.posted.app/api/link/match-link");
+      expect(calls[0]!.url).toBe("https://attr.postedapp.com/api/link/match-link");
     });
 
     it("returns null when match-link returns no link", async () => {
@@ -159,7 +159,7 @@ describe("resolveAppLaunch", () => {
   // -----------------------------------------------------------------------
   describe("link-present branch (launch URL present)", () => {
     it("calls universal-link-click and returns the URL", async () => {
-      const launchUrl = "https://posted.link/u/launch?ref=ad";
+      const launchUrl = "https://l.postedapp.com/u/launch?ref=ad";
       mockLinking.getInitialURL.mockResolvedValue(launchUrl);
       const calls = mockFetch({ allowed: true, clickId: "clk_abc" });
       const storage = makeStorage();
@@ -168,18 +168,20 @@ describe("resolveAppLaunch", () => {
 
       expect(result).toBe(launchUrl);
       const clickCall = calls.find(
-        (c) => c.url === "https://api.posted.app/api/link/universal-link-click",
+        (c) => c.url === "https://attr.postedapp.com/api/link/universal-link-click",
       );
       expect(clickCall).toBeDefined();
       // match-link must NOT be called for link-present launches
-      const matchCall = calls.find((c) => c.url === "https://api.posted.app/api/link/match-link");
+      const matchCall = calls.find(
+        (c) => c.url === "https://attr.postedapp.com/api/link/match-link",
+      );
       expect(matchCall).toBeUndefined();
     });
 
     it("resolves short link before returning the URL", async () => {
       // Single-segment path → short link resolution attempted
-      const shortUrl = "https://posted.link/x9Az";
-      const fullLink = "https://posted.link/app/summer-sale?utm_campaign=sm";
+      const shortUrl = "https://l.postedapp.com/x9Az";
+      const fullLink = "https://l.postedapp.com/app/summer-sale?utm_campaign=sm";
       mockLinking.getInitialURL.mockResolvedValue(shortUrl);
 
       const calls = mockFetch({ link: fullLink, allowed: true, clickId: null });
@@ -189,14 +191,14 @@ describe("resolveAppLaunch", () => {
 
       expect(result).toBe(fullLink);
       const resolveCall = calls.find(
-        (c) => c.url === "https://api.posted.app/api/link/resolve-short",
+        (c) => c.url === "https://attr.postedapp.com/api/link/resolve-short",
       );
       expect(resolveCall).toBeDefined();
       expect(resolveCall!.body).toEqual({ url: shortUrl });
     });
 
     it("falls back to original URL when short link API returns no link", async () => {
-      const shortUrl = "https://posted.link/abc1";
+      const shortUrl = "https://l.postedapp.com/abc1";
       mockLinking.getInitialURL.mockResolvedValue(shortUrl);
       // resolve-short returns no link; universal-link-click succeeds
       const calls = mockFetch({ link: null, allowed: true });
@@ -205,7 +207,7 @@ describe("resolveAppLaunch", () => {
       const result = await resolveAppLaunch(makeConfig(storage));
 
       expect(result).toBe(shortUrl);
-      expect(calls.some((c) => c.url === "https://api.posted.app/api/link/resolve-short")).toBe(
+      expect(calls.some((c) => c.url === "https://attr.postedapp.com/api/link/resolve-short")).toBe(
         true,
       );
     });
@@ -218,9 +220,11 @@ describe("resolveAppLaunch", () => {
       await resolveAppLaunch(makeConfig(storage));
 
       // Only match-link should be called (deferred), NOT universal-link-click
-      expect(calls.some((c) => c.url === "https://api.posted.app/api/link/match-link")).toBe(true);
+      expect(calls.some((c) => c.url === "https://attr.postedapp.com/api/link/match-link")).toBe(
+        true,
+      );
       expect(
-        calls.some((c) => c.url === "https://api.posted.app/api/link/universal-link-click"),
+        calls.some((c) => c.url === "https://attr.postedapp.com/api/link/universal-link-click"),
       ).toBe(false);
     });
   });

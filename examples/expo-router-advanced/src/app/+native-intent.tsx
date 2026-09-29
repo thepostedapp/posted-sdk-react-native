@@ -3,8 +3,7 @@ import { createPostedNativeIntentHandler } from "@posted-sdk/react-native/expo-r
 // Used only for runtime links. Cold-start links are handled by the SDK via
 // Linking.getInitialURL() — the splash screen covers that async wait.
 const postedHandler = createPostedNativeIntentHandler({
-  // TODO(B4): update host pattern to new short-link domain once confirmed.
-  hosts: [/\.posted\.link$/i],
+  hosts: [/\.l\.postedapp\.com$/i],
   fallbackPath: "/",
 });
 

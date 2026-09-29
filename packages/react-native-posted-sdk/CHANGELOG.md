@@ -57,9 +57,9 @@ full upgrade path see [MIGRATION.md](./MIGRATION.md) §7–§9.
   finalizes the migration off the legacy `godetour.*` domains onto the `posted`
   domains. **No public API surface changes** beyond the domain/metadata values below;
   symbol names are unchanged from 2.0.0.
-  - **Backend API base**: `godetour.dev` → `api.posted.app` (analytics + link
+  - **Backend API base**: `godetour.dev` → `attr.postedapp.com` (analytics + link
     endpoints). Request/response contract and paths are unchanged.
-  - **Default short-link domain**: `godetour.link` → `posted.link` (`DEFAULT_HOSTS` in
+  - **Default short-link domain**: `godetour.link` → `l.postedapp.com` (`DEFAULT_HOSTS` in
     the Expo Router native-intent handler, example associated-domains / intent-filters).
   - **Custom URL scheme**: `posted://` is the app scheme (unchanged since 2.0.0). The
     example apps now register `posted://` explicitly (iOS `CFBundleURLSchemes` /
@@ -131,4 +131,4 @@ All old `Detour*` names are re-exported as `@deprecated` aliases in 2.0.0 so you
 
 ### Short-link domain
 
-The short-link domain used in example apps and associated-domain configuration was `godetour.link` in 2.0.0. It is `posted.link` as of 3.0.0 — see the 3.0.0 rebrand notes above.
+The short-link domain used in example apps and associated-domain configuration was `godetour.link` in 2.0.0. It is `l.postedapp.com` as of 3.0.0 — see the 3.0.0 rebrand notes above.

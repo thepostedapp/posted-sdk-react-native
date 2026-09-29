@@ -6,8 +6,8 @@ import { SDK_HEADER_VALUE } from "../../version";
 import type { RequiredConfig } from "../types";
 import { getSyncDeviceInfo } from "../utils/deviceInfo";
 
-// Backend API base: api.posted.app (canonical per POS-312 V3; final value pending board ratification).
-const API_URL = "https://api.posted.app/api/link/universal-link-click";
+// Backend API base: attr.postedapp.com (canonical per POS-312 V3; ratified by POS-540).
+const API_URL = "https://attr.postedapp.com/api/link/universal-link-click";
 
 type UniversalLinkClickResponseBody = {
   allowed?: boolean;

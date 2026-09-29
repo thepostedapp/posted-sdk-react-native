@@ -2,8 +2,8 @@ import { Platform } from "react-native";
 
 import { SDK_HEADER_VALUE } from "../../version";
 
-// Backend API base: api.posted.app (canonical per POS-312 V3; final value pending board ratification).
-const RETENTION_API_URL = "https://api.posted.app/api/analytics/retention";
+// Backend API base: attr.postedapp.com (canonical per POS-312 V3; ratified by POS-540).
+const RETENTION_API_URL = "https://attr.postedapp.com/api/analytics/retention";
 
 export const sendRetentionEvent = async ({
   apiKey,

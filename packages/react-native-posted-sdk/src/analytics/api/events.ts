@@ -3,8 +3,8 @@ import { Platform } from "react-native";
 import { SDK_HEADER_VALUE } from "../../version";
 import type { PostedEvent } from "../types";
 
-// Backend API base: api.posted.app (canonical per POS-312 V3; final value pending board ratification).
-const EVENT_API_URL = "https://api.posted.app/api/analytics/event";
+// Backend API base: attr.postedapp.com (canonical per POS-312 V3; ratified by POS-540).
+const EVENT_API_URL = "https://attr.postedapp.com/api/analytics/event";
 
 export const sendEvent = async ({
   apiKey,

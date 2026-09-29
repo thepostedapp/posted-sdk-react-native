@@ -11,7 +11,7 @@
       "bundleIdentifier": "com.postedapp.exporouternativeintent",
       "supportsTablet": true,
       "icon": "./assets/posted-logo.png",
-      "associatedDomains": ["applinks:<your-org>.posted.link"]
+      "associatedDomains": ["applinks:<your-org>.l.postedapp.com"]
     },
     "android": {
       "package": "com.postedapp.exporouternativeintent",
@@ -27,7 +27,7 @@
           "data": [
             {
               "scheme": "https",
-              "host": "<your-org>.posted.link",
+              "host": "<your-org>.l.postedapp.com",
               "pathPrefix": "/<your-app-hash>"
             }
           ],

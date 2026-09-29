@@ -1,7 +1,8 @@
 import { Image, ScrollView, Text, View } from "react-native";
 
-import { usePostedContext } from "@posted-sdk/react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+import { usePostedContext } from "@posted-sdk/react-native";
 
 import { colors, styles } from "./styles";
 
@@ -43,13 +44,13 @@ export const Screen = () => {
             Uninstall the app or clear its data, open a Posted link in the mobile browser, then
             install and launch — the SDK resolves the link automatically.
           </Text>
-          <Text style={styles.code}>https://&lt;your-org&gt;.posted.link/&lt;hash&gt;/</Text>
+          <Text style={styles.code}>https://&lt;your-org&gt;.l.postedapp.com/&lt;hash&gt;/</Text>
 
           <Text style={styles.sectionHeader}>Universal / App Link</Text>
           <Text style={styles.bullet}>
             Open in browser or paste into Notes/Messages and tap — iOS/Android will launch the app.
           </Text>
-          <Text style={styles.code}>https://&lt;your-org&gt;.posted.link/&lt;hash&gt;/</Text>
+          <Text style={styles.code}>https://&lt;your-org&gt;.l.postedapp.com/&lt;hash&gt;/</Text>
 
           <View style={styles.divider} />
 

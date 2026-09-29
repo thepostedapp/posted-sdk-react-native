@@ -10,7 +10,7 @@ import { analyticsEmitter } from "./analytics/utils/analyticsEmitter";
 import { prepareDeviceIdForApi } from "./analytics/utils/devicePersistence";
 import { usePosted } from "./links/hooks/usePosted";
 import type { Config, PostedContextType } from "./links/types";
-import { migrateStorageKeys, resolveStorage } from "./links/utils/storage";
+import { resolveStorage } from "./links/utils/storage";
 
 type Props = PropsWithChildren & { config: Config };
 
@@ -35,10 +35,6 @@ const PostedProviderNative = ({ config, children }: Props) => {
   } = config;
 
   const storage = resolveStorage(userStorage);
-
-  useEffect(() => {
-    migrateStorageKeys(storage);
-  }, [storage]);
 
   useEffect(() => {
     activeProviderCount++;

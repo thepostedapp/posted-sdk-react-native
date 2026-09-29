@@ -8,10 +8,13 @@ changes. Findings for external links below.
 
 Links with no existing tracking that were confirmed dead and removed from the referencing doc.
 
-| repo-relative-path                              | dead URL                                                                                                                                                          | referencing doc                                                  |
-| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| `examples/react-navigation-advanced/README.md`  | `https://swmansion.com/blog/integrating-deferred-deep-linking-in-react-native-apps-1/`                                                                            | `examples/react-navigation-advanced/README.md` (POS-524 Part 1a) |
-| `packages/react-native-posted-sdk/MIGRATION.md` | `https://github.com/thepostedapp/posted-sdk-react-native/issues` (org at time of sweep was the pre-rename org; renamed to `thepostedapp` 2026-09-29, see POS-548) | `packages/react-native-posted-sdk/MIGRATION.md`                  |
+| repo-relative-path                             | dead URL                                                                      | referencing doc                                                  |
+| ---------------------------------------------- | ----------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `examples/react-navigation-advanced/README.md` | prior SDK vendor's blog post on deferred deep linking (URL redacted, POS-541) | `examples/react-navigation-advanced/README.md` (POS-524 Part 1a) |
+
+Note: a row previously tracked a dead `.../issues` link in `packages/react-native-posted-sdk/MIGRATION.md`;
+that file was deleted in POS-541 (never-published package, no migration audience), so the row is moot and
+has been dropped rather than updated to the post-rename org.
 
 ## Resolved — GitHub org rename (POS-548, 2026-09-29)
 
@@ -28,7 +31,7 @@ org for the cross-platform SDK links). The board completed the rename to `thepos
 ## Flagged — not removed, pending board decision
 
 These URLs also 404, but every occurrence already carries an inline `<!-- TODO(Bn): ... -->` marker added
-in the original rebrand commit (`e83777c`, "feat: rebrand Detour → posted-sdk"), tracking a **known**
+in the original SDK rebrand commit (`e83777c`), tracking a **known**
 pending domain/org change (new docs site, new backend domain, GitHub org rename — not yet live). They are
 not left over from neglect; each is deliberately tracked in-line already. Removing them now would strip
 the primary instructional content (dashboard/setup/testing/architecture links) from every README in this

@@ -82,8 +82,8 @@ import { type Config, PostedProvider, usePostedContext } from "@posted-sdk/react
 SplashScreen.preventAutoHideAsync();
 
 const config: Config = {
-  apiKey: "<REPLACE_WITH_YOUR_API_KEY>",
-  appID: "<REPLACE_WITH_APP_ID_FROM_PLATFORM>",
+  apiKey: "<YOUR_API_KEY>",
+  appID: "<YOUR_APP_ID>",
 };
 
 export default function RootLayout() {
@@ -148,8 +148,8 @@ import {
 SplashScreen.preventAutoHideAsync();
 
 const config: Config = {
-  apiKey: "<REPLACE_WITH_YOUR_API_KEY>",
-  appID: "<REPLACE_WITH_APP_ID_FROM_PLATFORM>",
+  apiKey: "<YOUR_API_KEY>",
+  appID: "<YOUR_APP_ID>",
 };
 
 const linking = {
@@ -231,8 +231,8 @@ Use `linkProcessingMode` to control which link sources the SDK listens to:
 
 ```ts
 const config: Config = {
-  apiKey: "<REPLACE_WITH_YOUR_API_KEY>",
-  appID: "<REPLACE_WITH_APP_ID_FROM_PLATFORM>",
+  apiKey: "<YOUR_API_KEY>",
+  appID: "<YOUR_APP_ID>",
   // Process Universal/App links and deferred links, but let your own
   // navigation layer handle custom scheme links (e.g. myapp://...).
   linkProcessingMode: "web-only",

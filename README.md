@@ -506,9 +506,9 @@ Native.
 
 posted-sdk is also available for other app stacks:
 
-- Android SDK: [https://github.com/posted-sdk/android](https://github.com/posted-sdk/android) <!-- TODO(B7): update when GitHub org is renamed -->
-- iOS SDK: [https://github.com/posted-sdk/ios](https://github.com/posted-sdk/ios) <!-- TODO(B7): update when GitHub org is renamed -->
-- Flutter SDK: [https://github.com/posted-sdk/flutter](https://github.com/posted-sdk/flutter) <!-- TODO(B7): update when GitHub org is renamed -->
+- Android SDK: [https://github.com/thepostedapp/posted-sdk-android](https://github.com/thepostedapp/posted-sdk-android)
+- iOS SDK: [https://github.com/thepostedapp/posted-sdk-ios](https://github.com/thepostedapp/posted-sdk-ios)
+- Flutter SDK: [https://github.com/thepostedapp/posted-sdk-flutter](https://github.com/thepostedapp/posted-sdk-flutter)
 
 ---
 

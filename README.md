@@ -1,5 +1,3 @@
-<img src="https://github.com/user-attachments/assets/c965b51b-7307-477a-8d22-9c9cd6da6231" alt="posted-sdk React Native" width="100%"/>
-
 # posted-sdk React Native
 
 posted-sdk React Native (`@posted-sdk/react-native`) is an SDK for handling deferred deep links in React Native. A deferred link works like a regular deep link, but survives the App Store or Play Store install — a user who clicks a link before having the app installed is redirected to the right screen on first launch. The SDK also handles Universal/App links and custom scheme links in a single unified API.

@@ -1,0 +1,64 @@
+{
+  "name": "react-native-posted-sdk-monorepo",
+  "private": true,
+  "packageManager": "pnpm@10.11.0",
+  "scripts": {
+    "build": "pnpm --filter @posted-sdk/react-native prepare",
+    "test": "pnpm --filter @posted-sdk/react-native test",
+    "typecheck": "pnpm --filter @posted-sdk/react-native typecheck",
+    "lint": "eslint . --cache --cache-location .eslintcache",
+    "release": "pnpm --filter @posted-sdk/react-native release",
+    "prebuild:all": "pnpm --filter './examples/*' prebuild",
+    "examples:expo-bare": "pnpm -C examples/expo-bare",
+    "examples:react-navigation": "pnpm -C examples/react-navigation",
+    "examples:react-navigation-advanced": "pnpm -C examples/react-navigation-advanced",
+    "examples:expo-router": "pnpm -C examples/expo-router",
+    "examples:expo-router-native-intent": "pnpm -C examples/expo-router-native-intent",
+    "examples:expo-router-advanced": "pnpm -C examples/expo-router-advanced",
+    "android": "expo run:android",
+    "ios": "expo run:ios"
+  },
+  "devDependencies": {
+    "@commitlint/config-conventional": "^19.6.0",
+    "@eslint/compat": "^1.2.7",
+    "@eslint/eslintrc": "^3.3.0",
+    "@eslint/js": "^9.22.0",
+    "@evilmartians/lefthook": "^1.5.0",
+    "@react-native/eslint-config": "^0.78.0",
+    "commitlint": "^19.6.1",
+    "eslint": "^9.22.0",
+    "eslint-config-prettier": "^10.1.1",
+    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
+    "eslint-plugin-prettier": "^5.2.3",
+    "prettier": "^3.0.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "metro": "0.83.5",
+      "metro-babel-transformer": "0.83.5",
+      "metro-cache": "0.83.5",
+      "metro-cache-key": "0.83.5",
+      "metro-config": "0.83.5",
+      "metro-core": "0.83.5",
+      "metro-file-map": "0.83.5",
+      "metro-minify-terser": "0.83.5",
+      "metro-resolver": "0.83.5",
+      "metro-runtime": "0.83.5",
+      "metro-source-map": "0.83.5",
+      "metro-symbolicate": "0.83.5",
+      "metro-transform-plugins": "0.83.5",
+      "metro-transform-worker": "0.83.5"
+    }
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "version": "1.0.0",
+  "dependencies": {
+    "expo": "~55.0.11",
+    "react": "19.2.0",
+    "react-native": "0.83.4"
+  }
+}

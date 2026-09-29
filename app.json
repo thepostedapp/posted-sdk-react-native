@@ -1,0 +1,8 @@
+{
+  "android": {
+    "package": "com.postedapp.reactnativepostedsdkmonorepo"
+  },
+  "ios": {
+    "bundleIdentifier": "com.postedapp.reactnativepostedsdkmonorepo"
+  }
+}

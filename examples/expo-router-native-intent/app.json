@@ -1,0 +1,58 @@
+{
+  "expo": {
+    "name": "Posted Expo Router Native Intent",
+    "slug": "posted-expo-router-native-intent",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/posted-logo.png",
+    "newArchEnabled": true,
+    "scheme": ["posted", "posted-expo-router-native-intent"],
+    "ios": {
+      "bundleIdentifier": "com.postedapp.exporouternativeintent",
+      "supportsTablet": true,
+      "icon": "./assets/posted-logo.png",
+      "associatedDomains": ["applinks:<your-org>.l.postedapp.com"]
+    },
+    "android": {
+      "package": "com.postedapp.exporouternativeintent",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/posted-logo.png",
+        "backgroundColor": "#0C1221"
+      },
+      "edgeToEdgeEnabled": true,
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "<your-org>.l.postedapp.com",
+              "pathPrefix": "/<your-app-hash>"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#0C1221",
+          "image": "./assets/posted-logo-transparent.png",
+          "imageWidth": 120,
+          "android": {
+            "image": "./assets/posted-logo-transparent.png",
+            "imageWidth": 120
+          }
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
+}

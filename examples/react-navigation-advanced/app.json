@@ -1,0 +1,56 @@
+{
+  "expo": {
+    "name": "Posted React Navigation Advanced",
+    "slug": "posted-react-navigation-advanced",
+    "version": "1.0.0",
+    "orientation": "default",
+    "icon": "./assets/posted-logo.png",
+    "newArchEnabled": true,
+    "scheme": ["posted", "posted-react-navigation-advanced"],
+    "ios": {
+      "bundleIdentifier": "com.postedapp.reactnavigationadvanced",
+      "supportsTablet": true,
+      "icon": "./assets/posted-logo.png",
+      "associatedDomains": ["applinks:<your-org>.l.postedapp.com"]
+    },
+    "android": {
+      "package": "com.postedapp.reactnavigationadvanced",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/posted-logo.png",
+        "backgroundColor": "#0C1221"
+      },
+      "edgeToEdgeEnabled": true,
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "<your-org>.l.postedapp.com",
+              "pathPrefix": "/<your-app-hash>"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ]
+    },
+    "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#0C1221",
+          "image": "./assets/posted-logo-transparent.png",
+          "imageWidth": 120,
+          "android": {
+            "image": "./assets/posted-logo-transparent.png",
+            "imageWidth": 120
+          }
+        }
+      ]
+    ],
+    "experiments": {
+      "reactCompiler": true
+    }
+  }
+}

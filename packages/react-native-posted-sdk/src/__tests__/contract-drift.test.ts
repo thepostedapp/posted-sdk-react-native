@@ -45,9 +45,16 @@ describe("contract drift guard", () => {
     expect(text).toContain("version: 1.1.0");
   });
 
-  it("vendored contract targets the postedapp.com API host", () => {
+  it("vendored contract targets only postedapp.com hosts", () => {
     const text = fs.readFileSync(fixturePath, "utf-8");
     expect(text).toContain("https://attr.postedapp.com");
-    expect(text).not.toContain("godetour.dev");
+    const foreign = [
+      ...new Set(
+        [...text.matchAll(/https?:\/\/([A-Za-z0-9._-]+)/g)]
+          .map((m) => m[1])
+          .filter((h) => h !== "postedapp.com" && !h.endsWith(".postedapp.com")),
+      ),
+    ];
+    expect(foreign).toEqual([]);
   });
 });

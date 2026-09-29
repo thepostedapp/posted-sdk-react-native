@@ -9,8 +9,8 @@ changes. Findings for external links below.
 Links with no existing tracking that were confirmed dead and removed from the referencing doc.
 
 | repo-relative-path                             | dead URL                                                                      | referencing doc                                                  |
-| ----------------------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------ |
-| `examples/react-navigation-advanced/README.md`  | prior SDK vendor's blog post on deferred deep linking (URL redacted, POS-541) | `examples/react-navigation-advanced/README.md` (POS-524 Part 1a) |
+| ---------------------------------------------- | ----------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `examples/react-navigation-advanced/README.md` | prior SDK vendor's blog post on deferred deep linking (URL redacted, POS-541) | `examples/react-navigation-advanced/README.md` (POS-524 Part 1a) |
 
 Note: a row previously tracked a dead `.../issues` link in `packages/react-native-posted-sdk/MIGRATION.md`;
 that file was deleted in POS-541 (never-published package, no migration audience), so the row is moot and

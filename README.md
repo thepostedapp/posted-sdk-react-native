@@ -2,20 +2,20 @@
 
 posted-sdk React Native (`@posted-sdk/react-native`) is an SDK for handling deferred deep links in React Native. A deferred link works like a regular deep link, but survives the App Store or Play Store install — a user who clicks a link before having the app installed is redirected to the right screen on first launch. The SDK also handles Universal/App links and custom scheme links in a single unified API.
 
-> **New to Posted?** Start with the **[cross-platform quickstart](https://github.com/thepostedapp/posted-sdk-admin/blob/main/GETTING-STARTED.md)** — create an app, copy your credentials, install the SDK, initialize it, and verify, all in one place. This README is the full React Native reference.
-
 ## Quick links
 
-- Documentation: [https://postedapp.com/docs/](https://postedapp.com/docs/) <!-- TODO(B6): update when new docs URL is live -->
-- Installation guide: [https://postedapp.com/docs/sdk/react-native/sdk-installation](https://postedapp.com/docs/sdk/react-native/sdk-installation) <!-- TODO(B6): update when new docs URL is live -->
+- **Getting-Started guide** (cross-platform golden path — create an app, install, verify): [GETTING-STARTED.md](https://github.com/thepostedapp/posted-sdk-admin/blob/main/GETTING-STARTED.md). This README is the full React Native reference.
+- **API host**: `attr.postedapp.com` (the SDK targets this by default — you do not configure it). Deep links resolve via `l.postedapp.com`.
+- **Troubleshooting**: [TROUBLESHOOTING.md](https://github.com/thepostedapp/posted-sdk-admin/blob/main/TROUBLESHOOTING.md)
+- **Backend contract redoc**: not yet live <!-- TODO(POS-589): link once the contract redoc is hosted — Firebase Hosting activation is gated on the POS-312 D1/D2 DNS decision -->
+- **Support**: see [Support](#support) below
+- Documentation site: <!-- TODO(B6): update when new docs URL is live --> [https://postedapp.com/docs/](https://postedapp.com/docs/)
 
-## Create an account
+## Create account
 
-You need a posted-sdk account to generate app credentials and configure your links.
+You need a posted-sdk account to generate app credentials (`app_id` + API key) and configure your links. Follow [**Create an app & find your credentials**](https://github.com/thepostedapp/posted-sdk-admin/blob/main/README.md#create-an-app--find-your-credentials) in the dashboard README — it covers the full create-app flow and where each credential appears afterward.
 
-<!-- TODO(B3): update sign-up URL once new backend domain is live -->
-
-## Installation
+## Install
 
 ### Package
 
@@ -60,7 +60,86 @@ module.exports = mergeConfig(getDefaultConfig(__dirname), {});
 
 Then rebuild — `PostedProvider` and the hooks work exactly as in the Expo examples.
 
-## Usage
+## Quickstart
+
+The fastest way to get attribution working: wrap your app in `PostedProvider` and read the resolved link via `usePostedContext` (see [Deep-link handling](#deep-link-handling) for navigation-library-specific wiring). If you don't need the provider/hook pattern, call `resolveAppLaunch()` directly instead.
+
+### Minimal init (PostedProvider)
+
+```tsx
+import { type Config, PostedProvider } from "@posted-sdk/react-native";
+
+const config: Config = {
+  apiKey: "<YOUR_API_KEY>",
+  appID: "<YOUR_APP_ID>",
+};
+
+export default function App() {
+  return <PostedProvider config={config}>{/* your app content */}</PostedProvider>;
+}
+```
+
+### Minimal `resolveAppLaunch()` call (no provider)
+
+```ts
+import { resolveAppLaunch } from "@posted-sdk/react-native";
+
+const link = await resolveAppLaunch({
+  apiKey: "<YOUR_API_KEY>",
+  appID: "<YOUR_APP_ID>",
+});
+
+if (link) {
+  // link is the attributed URL string — route to it however your app navigates.
+}
+```
+
+See [resolveAppLaunch](#resolveapplaunch) below for fire-once semantics and `resetSession()`.
+
+## Configure
+
+Beyond `apiKey` and `appID`, `Config` accepts a few optional knobs:
+
+- **`storage`** — override the default persistent storage (`@react-native-async-storage/async-storage`) with your own `PostedStorage` implementation.
+- **`shouldUseClipboard`** — iOS-only clipboard check for deferred-link matching, defaults to `true`. Android always uses the install referrer instead; clipboard is never accessed there regardless of this setting.
+- **`linkProcessingMode`** — controls which link sources the SDK listens to (`'all'` | `'web-only'` | `'deferred-only'`, default `'all'`). See [Deep-link handling](#controlling-which-links-the-sdk-processes) for the full behavior table.
+
+See [Types → Config](#config) for the full type definition.
+
+If threading a `config` object through every `resolveAppLaunch()` / `resetSession()` call is inconvenient, call `configure(config)` once at app startup instead:
+
+```ts
+import { configure, resolveAppLaunch } from "@posted-sdk/react-native";
+
+configure({ apiKey: "<YOUR_API_KEY>", appID: "<YOUR_APP_ID>" });
+
+// elsewhere, no config argument needed:
+const link = await resolveAppLaunch();
+```
+
+## resolveAppLaunch
+
+```ts
+resolveAppLaunch(config?: Config): Promise<PostedResult> // PostedResult = string | null
+```
+
+The single unified cold-start attribution entry point. Detects the launch URL internally via `Linking.getInitialURL()` and dispatches to the link-present or deferred branch automatically — there is no explicit-URL override on React Native.
+
+- **Fire-once per install**: the first call performs one network resolution and caches the result. It survives app restarts and app updates on the same install; subsequent calls make no network request.
+- **Re-arms** on a reinstall (OS-cleared storage) or an explicit `resetSession()` call.
+- Requires a `config` argument, or a prior `configure(config)` call (see [Configure](#configure)).
+
+### resetSession
+
+```ts
+resetSession(config?: Config): Promise<void>
+```
+
+Re-arms the fire-once resolution so the next `resolveAppLaunch()` call performs a fresh network resolution. Designed for explicit logout/reinstall flows, QA, and testing.
+
+`PostedProvider` / `usePostedContext` is a separate, parallel API surface for apps that want a parsed `PostedLink` object (route/pathname/params) driving navigation instead of the raw URL string — see [Deep-link handling](#deep-link-handling). Both surfaces resolve the same underlying attribution.
+
+## Deep-link handling
 
 Mount `PostedProvider` at the root of your app and configure it with your credentials. How you consume the resolved link depends on your navigation library.
 
@@ -263,53 +342,6 @@ PostedAnalytics.logRetention("week_1");
 
 </details>
 
-## Examples
-
-All example apps with the SDK integrated live in `examples/`:
-
-| Example                              | Description                                                    |
-| ------------------------------------ | -------------------------------------------------------------- |
-| `examples/expo-router`               | Minimal Expo Router example (recommended starting point)       |
-| `examples/expo-router-native-intent` | Expo Router with `+native-intent` handler                      |
-| `examples/expo-router-advanced`      | Expo Router with auth flow and custom native-intent            |
-| `examples/expo-bare`                 | Expo without file-based routing (plain `index.js` entry point) |
-| `examples/react-navigation`          | Minimal React Navigation example                               |
-| `examples/react-navigation-advanced` | React Navigation with auth + onboarding gated deep linking     |
-
-The monorepo uses **pnpm workspaces**. Start by installing all dependencies from the repo root:
-
-```sh
-pnpm install
-```
-
-Then run an example using the root-level shorthand scripts:
-
-```sh
-pnpm examples:expo-router ios
-pnpm examples:expo-router android
-pnpm examples:expo-router-native-intent ios
-pnpm examples:expo-router-advanced ios
-pnpm examples:expo-bare ios
-pnpm examples:react-navigation ios
-pnpm examples:react-navigation-advanced ios
-```
-
-These are aliases for `pnpm --filter <package-name> <script>`. You can also target examples directly using the workspace filter flag:
-
-```sh
-pnpm --filter @posted-sdk/react-native-expo-router ios
-```
-
-Or navigate into an example and run scripts there:
-
-```sh
-cd examples/expo-router
-pnpm ios
-pnpm android
-```
-
-> Running `pnpm ios` / `pnpm android` produces a development build. This is recommended over Expo Go for testing deep linking flows on a real device.
-
 ## Types
 
 The package exposes several types to help you with type-checking in your own codebase.
@@ -486,7 +518,31 @@ The stream is an idiomatic convenience exposed **only on the JS/Dart wrappers**,
 
 **Fire-once vs continuous** — `resolveAppLaunch` fires once per install and returns the attribution result; the continuous stream never participates in attribution and fires on every warm link.
 
-## Deprecated link methods → `resolveAppLaunch`
+## API Reference
+
+Every public export, with a pointer to where it's documented in depth:
+
+| Export                                                                                                                              | Kind                  | Docs                                                                                       |
+| ----------------------------------------------------------------------------------------------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------ |
+| `PostedProvider`                                                                                                                    | component             | [Deep-link handling](#deep-link-handling)                                                  |
+| `usePostedContext`                                                                                                                  | hook                  | [Deep-link handling](#deep-link-handling), [Types → PostedContextType](#postedcontexttype) |
+| `resolveAppLaunch(config?)`                                                                                                         | function              | [resolveAppLaunch](#resolveapplaunch)                                                      |
+| `resetSession(config?)`                                                                                                             | function              | [resolveAppLaunch](#resolveapplaunch)                                                      |
+| `configure(config)`                                                                                                                 | function              | [Configure](#configure)                                                                    |
+| `PostedAnalytics.logEvent` / `PostedAnalytics.logRetention`                                                                         | function              | [Analytics](#analytics)                                                                    |
+| `PostedEventNames`                                                                                                                  | enum                  | [Analytics](#analytics)                                                                    |
+| `Posted.getInitialURL()` / `Posted.addEventListener("url", ...)`                                                                    | function              | [Types → React Navigation adapter types](#react-navigation-adapter-types)                  |
+| `POSTED_LINKING_PREFIX`                                                                                                             | constant              | [Types → React Navigation adapter types](#react-navigation-adapter-types)                  |
+| `Config`, `PostedContextType`, `PostedLink`, `PostedResult`, `PostedUrlEvent`, `PostedUrlSubscription`, `PostedStorage`, `LinkType` | types                 | [Types](#types)                                                                            |
+| `resolveInitialLink` / `processLink` / `getDeferredLink` / `resolveShortLink`                                                       | function (deprecated) | [Migration](#migration)                                                                    |
+
+## Errors/Troubleshooting
+
+See the canonical [Troubleshooting & error-code reference](https://github.com/thepostedapp/posted-sdk-admin/blob/main/TROUBLESHOOTING.md) — 401s, no-match, deferred deep links not firing, iOS clipboard / Android install-referrer edge cases, and key rotation, each with cause → how to detect → fix.
+
+## Migration
+
+This package has never been published under a pre-rebrand name, so there is no external migration audience and no standalone `MIGRATION.md` — the table below is the complete migration guidance.
 
 The imperative link-resolution methods are consolidated into a single attribution-first
 call. `resolveInitialLink` / `processLink` / `getDeferredLink` / `resolveShortLink` are
@@ -502,13 +558,69 @@ Native.
 | `getDeferredLink(config)`        | `resolveAppLaunch(config)` |
 | `resolveShortLink(config, url?)` | `resolveAppLaunch(config)` |
 
-## Other posted-sdk SDKs
+## Versioning/compatibility
+
+- **SDK version**: `4.0.0` (aligned across iOS/Android/React Native/Flutter)
+- **Backend contract**: v1.1.0, served from `attr.postedapp.com`
+- **Min React Native**: `>=0.72` · **Min React**: `>=18` (see `peerDependencies` in [`package.json`](./packages/react-native-posted-sdk/package.json))
+- **Cross-platform compatibility matrix**: [COMPATIBILITY.md](https://github.com/thepostedapp/posted-sdk-admin/blob/main/COMPATIBILITY.md)
+
+## Example
+
+All example apps with the SDK integrated live in `examples/`:
+
+| Example                              | Description                                                    |
+| ------------------------------------ | -------------------------------------------------------------- |
+| `examples/expo-router`               | Minimal Expo Router example (recommended starting point)       |
+| `examples/expo-router-native-intent` | Expo Router with `+native-intent` handler                      |
+| `examples/expo-router-advanced`      | Expo Router with auth flow and custom native-intent            |
+| `examples/expo-bare`                 | Expo without file-based routing (plain `index.js` entry point) |
+| `examples/react-navigation`          | Minimal React Navigation example                               |
+| `examples/react-navigation-advanced` | React Navigation with auth + onboarding gated deep linking     |
+
+The monorepo uses **pnpm workspaces**. Start by installing all dependencies from the repo root:
+
+```sh
+pnpm install
+```
+
+Then run an example using the root-level shorthand scripts:
+
+```sh
+pnpm examples:expo-router ios
+pnpm examples:expo-router android
+pnpm examples:expo-router-native-intent ios
+pnpm examples:expo-router-advanced ios
+pnpm examples:expo-bare ios
+pnpm examples:react-navigation ios
+pnpm examples:react-navigation-advanced ios
+```
+
+These are aliases for `pnpm --filter <package-name> <script>`. You can also target examples directly using the workspace filter flag:
+
+```sh
+pnpm --filter @posted-sdk/react-native-expo-router ios
+```
+
+Or navigate into an example and run scripts there:
+
+```sh
+cd examples/expo-router
+pnpm ios
+pnpm android
+```
+
+> Running `pnpm ios` / `pnpm android` produces a development build. This is recommended over Expo Go for testing deep linking flows on a real device.
+
+## Support
+
+- Found a bug or have a question specific to this SDK? [Open an issue](https://github.com/thepostedapp/posted-sdk-react-native/issues) on this repo.
+- For contribution guidelines, see [CONTRIBUTING.md](./CONTRIBUTING.md).
+
+### Other posted-sdk SDKs
 
 posted-sdk is also available for other app stacks:
 
 - Android SDK: [https://github.com/thepostedapp/posted-sdk-android](https://github.com/thepostedapp/posted-sdk-android)
 - iOS SDK: [https://github.com/thepostedapp/posted-sdk-ios](https://github.com/thepostedapp/posted-sdk-ios)
 - Flutter SDK: [https://github.com/thepostedapp/posted-sdk-flutter](https://github.com/thepostedapp/posted-sdk-flutter)
-
----
-

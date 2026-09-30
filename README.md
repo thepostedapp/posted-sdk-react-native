@@ -563,8 +563,7 @@ Native.
 - **SDK version**: `4.0.0` (aligned across iOS/Android/React Native/Flutter)
 - **Backend contract**: v1.1.0, served from `attr.postedapp.com`
 - **Min React Native**: `>=0.72` · **Min React**: `>=18` (see `peerDependencies` in [`package.json`](./packages/react-native-posted-sdk/package.json))
-
-<!-- TODO(POS-610): link the cross-platform compatibility matrix (COMPATIBILITY.md in posted-sdk-admin) once it ships -->
+- **Cross-platform compatibility matrix**: [COMPATIBILITY.md](https://github.com/thepostedapp/posted-sdk-admin/blob/main/COMPATIBILITY.md)
 
 ## Example
 

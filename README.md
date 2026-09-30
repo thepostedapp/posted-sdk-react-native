@@ -520,6 +520,8 @@ The stream is an idiomatic convenience exposed **only on the JS/Dart wrappers**,
 
 ## API Reference
 
+Auto-generated from source via [TypeDoc](https://typedoc.org/) — CI fails the build if generation errors, so this can't drift from code. Build it locally with `pnpm --filter @posted-sdk/react-native docs`, then open `packages/react-native-posted-sdk/docs/api/index.html`.
+
 Every public export, with a pointer to where it's documented in depth:
 
 | Export                                                                                                                              | Kind                  | Docs                                                                                       |

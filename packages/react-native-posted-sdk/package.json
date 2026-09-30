@@ -41,6 +41,7 @@
   "scripts": {
     "test": "jest",
     "typecheck": "tsc",
+    "docs": "typedoc",
     "lint": "eslint . --cache --cache-location .eslintcache",
     "clean": "del-cli lib",
     "prepare": "bob build",
@@ -85,6 +86,7 @@
     "react-native": "0.83.4",
     "react-native-builder-bob": "0.40.13",
     "release-it": "^17.10.0",
+    "typedoc": "^0.28.20",
     "typescript": "^5.8.3"
   },
   "peerDependencies": {

@@ -5,6 +5,7 @@
 The SDK has one function, `reportInstall()`. Call it on every app launch. It sends the report once per install.
 
 - [Requirements](#requirements)
+- [Get your app ID and API key](#get-your-app-id-and-api-key)
 - [1. Install](#1-install)
 - [2. Report the install](#2-report-the-install)
 - [3. Verify the integration](#3-verify-the-integration)
@@ -17,6 +18,15 @@ The SDK has one function, `reportInstall()`. Call it on every app launch. It sen
 
 - React Native `>=0.72`
 - Expo and bare React Native projects are both supported. Bare projects don't need Expo Modules.
+
+## Get your app ID and API key
+
+Both come from the Posted dashboard at [app.postedapp.com/dashboard/settings](https://app.postedapp.com/dashboard/settings), under **Posted SDK**.
+
+1. Under **Apps**, click **Add app** and enter your app's details. The dashboard shows its **app ID** (`app_…`).
+2. Under **API keys**, click **Create key**. Copy the key when it is shown; it is not displayed again.
+
+Pass these as `appID` and `apiKey` to `reportInstall()`. One API key works for all apps in your account.
 
 ## 1. Install
 
@@ -82,8 +92,8 @@ reportInstall(config: Config): Promise<void>
 
 | Field     | Type            | Required | Description                                                                            |
 | --------- | --------------- | -------- | -------------------------------------------------------------------------------------- |
-| `apiKey`  | `string`        | Yes      | Your API key from the dashboard.                                                       |
-| `appID`   | `string`        | Yes      | Your app ID from the dashboard.                                                        |
+| `apiKey`  | `string`        | Yes      | API key from the dashboard, **Posted SDK → API keys**.                                 |
+| `appID`   | `string`        | Yes      | App ID from the dashboard, **Posted SDK → Apps**.                                      |
 | `storage` | `PostedStorage` | No       | Persistent key-value storage. Defaults to `@react-native-async-storage/async-storage`. |
 
 ### Custom storage

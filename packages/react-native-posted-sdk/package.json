@@ -1,7 +1,7 @@
 {
   "name": "@posted-sdk/react-native",
   "version": "1.0.0",
-  "description": "Reports app installs to posted-sdk for ad attribution — React Native package",
+  "description": "Reports app installs to Posted for ad attribution. React Native package.",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
   "exports": {
@@ -28,8 +28,8 @@
     "lint": "eslint . --cache --cache-location .eslintcache",
     "clean": "del-cli lib",
     "prepare": "bob build",
-    "prepack": "cp ../../README.md README.md",
-    "postpack": "rm README.md",
+    "prepack": "cp ../../README.md README.md && cp ../../LICENSE LICENSE",
+    "postpack": "rm README.md LICENSE",
     "release": "release-it"
   },
   "keywords": [
@@ -47,6 +47,7 @@
     "url": "https://github.com/thepostedapp/posted-sdk-react-native/issues"
   },
   "homepage": "https://github.com/thepostedapp/posted-sdk-react-native#readme",
+  "license": "MIT",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"

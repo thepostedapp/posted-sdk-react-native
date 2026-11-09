@@ -16,6 +16,10 @@
   "files": [
     "src",
     "lib",
+    "android",
+    "ios",
+    "*.podspec",
+    "!android/build",
     "!**/__tests__",
     "!**/__fixtures__",
     "!**/__mocks__",

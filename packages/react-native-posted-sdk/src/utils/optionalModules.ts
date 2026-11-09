@@ -22,6 +22,7 @@ export type ReactNativeDeviceInfoModule = {
 };
 
 type ExpoConstantsModule = {
+  executionEnvironment?: string;
   getWebViewUserAgentAsync?: () => Promise<string | null>;
 };
 

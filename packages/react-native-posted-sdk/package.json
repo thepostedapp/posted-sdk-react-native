@@ -1,6 +1,6 @@
 {
   "name": "@posted-sdk/react-native",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Reports app installs to Posted for ad attribution. React Native package.",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",

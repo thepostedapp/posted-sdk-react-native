@@ -2,6 +2,7 @@ import type { Config } from "./types";
 import { prepareDeviceIdForApi } from "./utils/deviceId";
 import { getInstallContext } from "./utils/installContext";
 import { getInstallReferrerClickId } from "./utils/installReferrer";
+import { getInstallSource } from "./utils/installSource";
 import { StorageKeys, resolveStorage } from "./utils/storage";
 import { SDK_HEADER_VALUE } from "./version";
 
@@ -21,6 +22,7 @@ const send = async ({ apiKey, appID, storage: userStorage }: Config) => {
     const storage = resolveStorage(userStorage);
     if (await storage.getItem(StorageKeys.INSTALL_REPORTED_FLAG_KEY)) return;
 
+    const installSource = getInstallSource();
     const [clickId, installContext, deviceId] = await Promise.all([
       getInstallReferrerClickId(),
       getInstallContext(),
@@ -39,6 +41,7 @@ const send = async ({ apiKey, appID, storage: userStorage }: Config) => {
         ...installContext,
         device_id: deviceId,
         ...(clickId ? { clickId } : {}),
+        ...(installSource ? { installSource } : {}),
       }),
     });
 

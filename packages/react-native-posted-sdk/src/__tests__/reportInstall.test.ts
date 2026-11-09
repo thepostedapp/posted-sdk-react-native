@@ -1,4 +1,6 @@
 // ---- Imports ----
+import { NativeModules } from "react-native";
+
 import * as Application from "expo-application";
 
 import { reportInstall } from "../reportInstall";
@@ -13,6 +15,7 @@ import { SDK_HEADER_VALUE } from "../version";
  *   2. Play referrer click id included when present
  *   3. Sent once: the flag is armed only on a 2xx, so failures retry
  *   4. Never throws; concurrent calls share one request
+ *   5. Install source from the native module, omitted when it isn't linked
  */
 
 // ---- Module mocks ----
@@ -43,6 +46,7 @@ jest.mock("expo-device", () => ({
 }));
 
 jest.mock("react-native", () => ({
+  NativeModules: {},
   Platform: { OS: "ios" },
   Dimensions: {
     get: jest.fn().mockReturnValue({ width: 390, height: 844 }),
@@ -127,6 +131,37 @@ describe("reportInstall", () => {
     );
     await reportInstall({ apiKey: "key", appID: "app_android", storage: makeStorage() });
     expect(sentBody().clickId).toBe("0192-bridge-click");
+  });
+
+  describe("install source", () => {
+    const dev = __DEV__;
+    const setDev = (value: boolean) => {
+      (global as unknown as { __DEV__: boolean }).__DEV__ = value;
+    };
+    afterEach(() => {
+      setDev(dev);
+      delete NativeModules.PostedSdk;
+    });
+
+    it("sends the native module's source in a release build", async () => {
+      setDev(false);
+      NativeModules.PostedSdk = { installSource: "store" };
+      await reportInstall({ apiKey: "key", appID: "app_ios", storage: makeStorage() });
+      expect(sentBody().installSource).toBe("store");
+    });
+
+    it("omits it when the native module isn't linked", async () => {
+      setDev(false);
+      await reportInstall({ apiKey: "key", appID: "app_ios", storage: makeStorage() });
+      expect(sentBody()).not.toHaveProperty("installSource");
+    });
+
+    it("reports a dev build as development", async () => {
+      setDev(true);
+      NativeModules.PostedSdk = { installSource: "store" };
+      await reportInstall({ apiKey: "key", appID: "app_ios", storage: makeStorage() });
+      expect(sentBody().installSource).toBe("development");
+    });
   });
 
   it("sends nothing once the install was reported", async () => {

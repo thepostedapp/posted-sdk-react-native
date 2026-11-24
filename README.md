@@ -11,6 +11,7 @@ The SDK reports installs only. It does not report purchases, signups or other in
 - [1. Install](#1-install)
 - [2. Report the install](#2-report-the-install)
 - [3. Verify the integration](#3-verify-the-integration)
+- [RevenueCat](#revenuecat)
 - [Configuration](#configuration)
 - [Privacy](#privacy)
 - [Troubleshooting](#troubleshooting)
@@ -33,7 +34,7 @@ Pass these as `appID` and `apiKey` to `reportInstall()`. One API key works for a
 ## 1. Install
 
 ```sh
-npm install @posted-sdk/react-native@^1.0.2
+npm install @posted-sdk/react-native@^1.1.0
 ```
 
 ### Expo
@@ -74,6 +75,22 @@ You don't need to `await` it. It never throws, and it doesn't block app startup.
 1. Use a **real device** and a build installed from the App Store, TestFlight or Google Play (internal testing is fine). Simulators, emulators and Expo Go are not attributed.
 2. Run the app with a **fresh install**. Uninstalling clears the SDK's storage, so a reinstall reports again.
 3. Watch the logs. Nothing is logged on success. On failure, you'll see a line starting with `🔗[Posted:INSTALL_ERROR]` (see [Troubleshooting](#troubleshooting)).
+
+## RevenueCat
+
+If your app uses RevenueCat, pass its app user ID to Posted after `Purchases.configure(...)`. Posted uses it to attribute purchases to your campaigns.
+
+```ts
+import Purchases from "react-native-purchases";
+
+import { setRevenueCatUserId } from "@posted-sdk/react-native";
+
+Purchases.configure({ apiKey: "<REVENUECAT_API_KEY>" });
+
+setRevenueCatUserId(config, await Purchases.getAppUserID());
+```
+
+Call it on every launch, with the same config as `reportInstall()`. The ID is sent once per install, and it never throws.
 
 ## Configuration
 
@@ -117,7 +134,7 @@ reportInstall({
 });
 ```
 
-The SDK stores two keys, both prefixed with `Posted_`: the "install reported" flag and a device ID. If storage is cleared, the install is reported again.
+The SDK stores three keys, all prefixed with `Posted_`: the "install reported" flag, the "RevenueCat user reported" flag and a device ID. If storage is cleared, the install is reported again.
 
 
 ## Privacy

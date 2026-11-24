@@ -4,10 +4,12 @@ import type { PostedStorage } from "../types";
 const STORAGE_KEY_PREFIX = "Posted_";
 const DEVICE_ID = `${STORAGE_KEY_PREFIX}deviceId`;
 const INSTALL_REPORTED_FLAG = `${STORAGE_KEY_PREFIX}installReported`;
+const REVENUECAT_USER_REPORTED_FLAG = `${STORAGE_KEY_PREFIX}revenueCatUserReported`;
 
 export enum StorageKeys {
   DEVICE_ID_KEY = DEVICE_ID,
   INSTALL_REPORTED_FLAG_KEY = INSTALL_REPORTED_FLAG,
+  REVENUECAT_USER_REPORTED_FLAG_KEY = REVENUECAT_USER_REPORTED_FLAG,
 }
 
 let DefaultAsyncStorage: PostedStorage | null = null;

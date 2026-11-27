@@ -2,6 +2,13 @@
 
 All notable changes to `@posted-sdk/react-native` are documented here.
 
+## [1.1.1]
+
+### Changed
+
+- **`setRevenueCatUserId` is now `setPurchasesUserId(config, id)`.** Pass the
+  RevenueCat or Superwall user ID. The old name is removed.
+
 ## [1.1.0]
 
 ### Added

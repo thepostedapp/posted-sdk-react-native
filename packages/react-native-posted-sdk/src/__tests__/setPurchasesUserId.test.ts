@@ -1,13 +1,13 @@
 // ---- Imports ----
-import { setRevenueCatUserId } from "../setRevenueCatUserId";
+import { setPurchasesUserId } from "../setPurchasesUserId";
 import type { PostedStorage } from "../types";
 import { SDK_HEADER_VALUE } from "../version";
 
 /**
- * setRevenueCatUserId — links the RevenueCat app user id to the install.
+ * setPurchasesUserId — links the RevenueCat or Superwall user id to the install.
  *
  * Covers:
- *   1. POST /api/revenueCatUser with SDK auth, the install's device_id and rc_user_id
+ *   1. POST /api/purchasesUser with SDK auth, the install's device_id and purchases_user_id
  *   2. The install is reported first; nothing is sent while it stays unreported
  *   3. Sent once: the flag is armed only on a 2xx, so failures retry
  *   4. Never throws; concurrent calls share one request
@@ -53,7 +53,7 @@ jest.mock("react-native", () => ({
 // ---- Helpers ----
 
 const INSTALL_URL = "https://attr.postedapp.com/api/install";
-const REVENUECAT_USER_URL = "https://attr.postedapp.com/api/revenueCatUser";
+const PURCHASES_USER_URL = "https://attr.postedapp.com/api/purchasesUser";
 const INSTALL_FLAG_KEY = "Posted_installReported";
 const FLAG_KEY = "Posted_revenueCatUserReported";
 
@@ -82,7 +82,7 @@ function sentBody(call = 0): Record<string, unknown> {
 
 // ---- Tests ----
 
-describe("setRevenueCatUserId", () => {
+describe("setPurchasesUserId", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     global.fetch = fetchMock as unknown as typeof fetch;
@@ -93,12 +93,12 @@ describe("setRevenueCatUserId", () => {
 
   it("reports the install, then posts the device id and user id with SDK auth and arms the flag", async () => {
     const storage = makeStorage();
-    await setRevenueCatUserId({ apiKey: "key", appID: "app_ios", storage }, "rc-user-1");
+    await setPurchasesUserId({ apiKey: "key", appID: "app_ios", storage }, "rc-user-1");
 
     expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(fetchMock.mock.calls[0][0]).toBe(INSTALL_URL);
     const [url, init] = fetchMock.mock.calls[1];
-    expect(url).toBe(REVENUECAT_USER_URL);
+    expect(url).toBe(PURCHASES_USER_URL);
     expect(init.method).toBe("POST");
     expect(init.headers).toEqual(fetchMock.mock.calls[0][1].headers);
     expect(init.headers).toEqual({
@@ -109,24 +109,24 @@ describe("setRevenueCatUserId", () => {
     });
     expect(sentBody(1)).toEqual({
       device_id: sentBody(0).device_id,
-      rc_user_id: "rc-user-1",
+      purchases_user_id: "rc-user-1",
     });
     expect(storage._store[FLAG_KEY]).toBe("true");
   });
 
   it("skips the install report when it was already reported", async () => {
     const storage = makeStorage({ [INSTALL_FLAG_KEY]: "true" });
-    await setRevenueCatUserId({ apiKey: "key", appID: "app_ios", storage }, "rc-user-1");
+    await setPurchasesUserId({ apiKey: "key", appID: "app_ios", storage }, "rc-user-1");
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(fetchMock.mock.calls[0][0]).toBe(REVENUECAT_USER_URL);
+    expect(fetchMock.mock.calls[0][0]).toBe(PURCHASES_USER_URL);
     expect(storage._store[FLAG_KEY]).toBe("true");
   });
 
   it("sends nothing while the install is unreported", async () => {
     const storage = makeStorage();
     respond(500);
-    await setRevenueCatUserId({ apiKey: "key", appID: "app_ios", storage }, "rc-user-1");
+    await setPurchasesUserId({ apiKey: "key", appID: "app_ios", storage }, "rc-user-1");
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(fetchMock.mock.calls[0][0]).toBe(INSTALL_URL);
@@ -134,7 +134,7 @@ describe("setRevenueCatUserId", () => {
   });
 
   it("sends nothing once the user was reported", async () => {
-    await setRevenueCatUserId(
+    await setPurchasesUserId(
       { apiKey: "key", appID: "app_ios", storage: makeStorage({ [FLAG_KEY]: "true" }) },
       "rc-user-1",
     );
@@ -144,11 +144,11 @@ describe("setRevenueCatUserId", () => {
   it("leaves the flag unarmed on a non-2xx, so the next call retries", async () => {
     const storage = makeStorage({ [INSTALL_FLAG_KEY]: "true" });
     respond(404);
-    await setRevenueCatUserId({ apiKey: "key", appID: "app_ios", storage }, "rc-user-1");
+    await setPurchasesUserId({ apiKey: "key", appID: "app_ios", storage }, "rc-user-1");
     expect(storage._store[FLAG_KEY]).toBeUndefined();
 
     respond(200);
-    await setRevenueCatUserId({ apiKey: "key", appID: "app_ios", storage }, "rc-user-1");
+    await setPurchasesUserId({ apiKey: "key", appID: "app_ios", storage }, "rc-user-1");
     expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(storage._store[FLAG_KEY]).toBe("true");
   });
@@ -157,32 +157,33 @@ describe("setRevenueCatUserId", () => {
     const storage = makeStorage({ [INSTALL_FLAG_KEY]: "true" });
     fetchMock.mockRejectedValue(new Error("offline"));
     await expect(
-      setRevenueCatUserId({ apiKey: "key", appID: "app_ios", storage }, "rc-user-1"),
+      setPurchasesUserId({ apiKey: "key", appID: "app_ios", storage }, "rc-user-1"),
     ).resolves.toBeUndefined();
     expect(storage._store[FLAG_KEY]).toBeUndefined();
   });
 
   it("sends nothing for an empty id", async () => {
     const storage = makeStorage();
-    await setRevenueCatUserId({ apiKey: "key", appID: "app_ios", storage }, "");
+    await setPurchasesUserId({ apiKey: "key", appID: "app_ios", storage }, "");
     expect(fetchMock).not.toHaveBeenCalled();
     expect(storage._store[FLAG_KEY]).toBeUndefined();
   });
 
   it("is exported from the package entry point", async () => {
-    const { setRevenueCatUserId: publicSetRevenueCatUserId } = await import("../index");
+    const { setPurchasesUserId: publicSetPurchasesUserId } = await import("../index");
     const storage = makeStorage({ [INSTALL_FLAG_KEY]: "true" });
-    await publicSetRevenueCatUserId({ apiKey: "key", appID: "app_ios", storage }, "rc-user-1");
-    expect(fetchMock.mock.calls[0][0]).toBe(REVENUECAT_USER_URL);
+    await publicSetPurchasesUserId({ apiKey: "key", appID: "app_ios", storage }, "rc-user-1");
+    expect(fetchMock.mock.calls[0][0]).toBe(PURCHASES_USER_URL);
     expect(storage._store[FLAG_KEY]).toBe("true");
   });
 
   it("shares one request between concurrent calls", async () => {
     const storage = makeStorage({ [INSTALL_FLAG_KEY]: "true" });
     await Promise.all([
-      setRevenueCatUserId({ apiKey: "key", appID: "app_ios", storage }, "rc-user-1"),
-      setRevenueCatUserId({ apiKey: "key", appID: "app_ios", storage }, "rc-user-1"),
+      setPurchasesUserId({ apiKey: "key", appID: "app_ios", storage }, "rc-user-1"),
+      setPurchasesUserId({ apiKey: "key", appID: "app_ios", storage }, "rc-user-1"),
     ]);
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
+
 });

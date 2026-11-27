@@ -1,4 +1,4 @@
 export { reportInstall } from "./reportInstall";
-export { setRevenueCatUserId } from "./setRevenueCatUserId";
+export { setPurchasesUserId } from "./setPurchasesUserId";
 
 export type { Config, PostedStorage } from "./types";

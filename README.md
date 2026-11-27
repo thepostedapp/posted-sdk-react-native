@@ -11,7 +11,7 @@ The SDK reports installs only. It does not report purchases, signups or other in
 - [1. Install](#1-install)
 - [2. Report the install](#2-report-the-install)
 - [3. Verify the integration](#3-verify-the-integration)
-- [RevenueCat](#revenuecat)
+- [Purchases](#purchases)
 - [Configuration](#configuration)
 - [Privacy](#privacy)
 - [Troubleshooting](#troubleshooting)
@@ -34,7 +34,7 @@ Pass these as `appID` and `apiKey` to `reportInstall()`. One API key works for a
 ## 1. Install
 
 ```sh
-npm install @posted-sdk/react-native@^1.1.0
+npm install @posted-sdk/react-native@^1.1.1
 ```
 
 ### Expo
@@ -76,19 +76,29 @@ You don't need to `await` it. It never throws, and it doesn't block app startup.
 2. Run the app with a **fresh install**. Uninstalling clears the SDK's storage, so a reinstall reports again.
 3. Watch the logs. Nothing is logged on success. On failure, you'll see a line starting with `🔗[Posted:INSTALL_ERROR]` (see [Troubleshooting](#troubleshooting)).
 
-## RevenueCat
+## Purchases
 
-If your app uses RevenueCat, pass its app user ID to Posted after `Purchases.configure(...)`. Posted uses it to attribute purchases to your campaigns.
+If your app sells through RevenueCat or Superwall, pass its user ID to Posted after the purchases SDK is configured. Posted uses it to attribute purchases to your campaigns.
 
 ```ts
 import Purchases from "react-native-purchases";
 
-import { setRevenueCatUserId } from "@posted-sdk/react-native";
+import { setPurchasesUserId } from "@posted-sdk/react-native";
 
 Purchases.configure({ apiKey: "<REVENUECAT_API_KEY>" });
 
-setRevenueCatUserId(config, await Purchases.getAppUserID());
+setPurchasesUserId(config, await Purchases.getAppUserID());
 ```
+
+With Superwall, pass its user ID instead:
+
+```ts
+import Superwall from "expo-superwall/compat";
+
+setPurchasesUserId(config, await Superwall.shared.getUserId());
+```
+
+The older `react-native-superwall` can't return the ID, so pass the one you give to `identify()`.
 
 Call it on every launch, with the same config as `reportInstall()`. The ID is sent once per install, and it never throws.
 
@@ -134,7 +144,7 @@ reportInstall({
 });
 ```
 
-The SDK stores three keys, all prefixed with `Posted_`: the "install reported" flag, the "RevenueCat user reported" flag and a device ID. If storage is cleared, the install is reported again.
+The SDK stores three keys, all prefixed with `Posted_`: the "install reported" flag, the "Purchases user reported" flag and a device ID. If storage is cleared, the install is reported again.
 
 
 ## Privacy
